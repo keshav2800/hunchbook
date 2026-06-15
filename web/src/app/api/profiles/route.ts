@@ -13,5 +13,5 @@ export async function GET(req: Request) {
     .map((a) => a.trim())
     .filter((a) => a.startsWith('0x'))
     .slice(0, MAX_BATCH);
-  return NextResponse.json({ usernames: getUsernames(addresses) });
+  return NextResponse.json({ usernames: await getUsernames(addresses) });
 }

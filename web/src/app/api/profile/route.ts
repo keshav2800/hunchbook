@@ -16,7 +16,7 @@ export async function GET(req: Request) {
   if (!address?.startsWith('0x')) {
     return NextResponse.json({ error: 'address query param required' }, { status: 400 });
   }
-  const row = getProfile(address);
+  const row = await getProfile(address);
   return NextResponse.json(
     row ? { address: row.address, username: row.username, bio: row.bio } : {},
   );
@@ -53,12 +53,12 @@ export async function PUT(req: Request) {
     return NextResponse.json({ error: 'Signature verification failed.' }, { status: 401 });
   }
 
-  if (upsertProfile({ address, username, email, bio }) === 'username_taken') {
+  if ((await upsertProfile({ address, username, email, bio })) === 'username_taken') {
     return NextResponse.json({ error: 'That username is taken.' }, { status: 409 });
   }
   // Return what was actually stored — the email column is first-write-wins,
   // so an attempted change comes back as the original value.
-  const row = getProfile(address);
+  const row = await getProfile(address);
   return NextResponse.json({
     address,
     username: row?.username ?? username,

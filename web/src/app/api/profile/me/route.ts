@@ -25,7 +25,7 @@ export async function POST(req: Request) {
   if (!ok) {
     return NextResponse.json({ error: 'Signature verification failed.' }, { status: 401 });
   }
-  const row = getProfile(address);
+  const row = await getProfile(address);
   return NextResponse.json(
     row ? { address: row.address, username: row.username, email: row.email, bio: row.bio } : {},
   );

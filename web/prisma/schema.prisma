@@ -1,0 +1,25 @@
+// Hunchbook off-chain data (Postgres / Neon).
+// Bets, wins, and the leaderboard remain ON-CHAIN (indexer + tx scan) — Postgres
+// holds identity + future social/launchpad data the chain can't serve well.
+// Use Neon's POOLED connection string in DATABASE_URL for serverless (…-pooler.…).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// Off-chain user profile. Username uniqueness is enforced case-insensitively in
+/// code (see upsertProfile); email is write-once (set from Google sign-in).
+model Profile {
+  address   String   @id
+  username  String
+  email     String   @default("")
+  bio       String   @default("")
+  updatedAt DateTime @updatedAt
+
+  @@map("profiles")
+}
