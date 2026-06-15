@@ -1,0 +1,183 @@
+(.venv) keshav@Keshavs-MacBook-Pro backtest % .venv/bin/python3 backtest.py
+DATA_DIR: /Users/keshav/Downloads/deepbook/backtest/data
+PROC_DIR: /Users/keshav/Downloads/deepbook/backtest/data/processed
+mints             1128 rows
+redeems            787 rows
+range_mints        213 rows
+range_redeems      153 rows
+supplies           102 rows
+withdrawals         58 rows
+oracles           3544 rows
+
+Mint head:
+                       ts                                          oracle_id  is_up  strike_usd  quantity  cost_usd
+0 2026-06-04 09:49:45.891  0x0d10f30754bc985941d37c6938b5e15d842bf8fe87cb...   True     63040.0   1891072  0.666121
+1 2026-06-04 09:49:11.365  0x0d10f30754bc985941d37c6938b5e15d842bf8fe87cb...  False     63040.0   1837132  1.287668
+2 2026-06-04 09:48:58.767  0x0d10f30754bc985941d37c6938b5e15d842bf8fe87cb...  False     63040.0   1863687  1.401884
+3 2026-06-04 09:48:46.786  0x0d10f30754bc985941d37c6938b5e15d842bf8fe87cb...  False     63040.0   1758034  1.300733
+4 2026-06-04 09:48:30.480  0x0d10f30754bc985941d37c6938b5e15d842bf8fe87cb...   True     63040.0   1931854  0.624313
+
+Useful oracles (had ≥1 bet): 407
+status
+settled    401
+active       6
+Name: count, dtype: int64
+Mints on useful oracles:   1128 / 1128
+Redeems on useful oracles: 787 / 787
+Vault perf series: 161 points, 2026-04-20 → 2026-06-04
+                       ts  share_price  vault_value_usd
+0 2026-04-20 20:12:02.850     1.000000     1.000000e+06
+1 2026-05-07 12:17:39.457     1.000603     1.000050e+06
+2 2026-05-08 13:44:04.156     1.000603     1.000025e+06
+3 2026-05-11 13:20:17.305     1.000452     1.001025e+06
+4 2026-05-12 22:46:51.035     1.000404     1.001035e+06
+
+Naked PLP (1x testnet activity) metrics:
+  days: 44.6183
+  total_return_pct: 0.2663
+  apy_pct: 2.1991
+  max_dd_pct: -0.0229
+  sharpe: 9.1489
+
+Saved naked PLP chart to backtest/out_naked_plp.png
+Redeem columns: ['event_digest', 'digest', 'sender', 'checkpoint', 'checkpoint_timestamp_ms', 'tx_index', 'event_index', 'package', 'predict_id', 'manager_id', 'owner', 'executor', 'quote_asset', 'oracle_id', 'expiry', 'strike', 'is_up', 'quantity', 'payout', 'bid_price', 'is_settled', 'ts']
+                                    event_digest                                        digest                                                              sender  checkpoint  checkpoint_timestamp_ms  tx_index  event_index                                                           package                                                          predict_id                                                          manager_id                                                               owner                                                            executor                                                                     quote_asset                                                           oracle_id         expiry          strike  is_up  quantity   payout   bid_price  is_settled                      ts
+0  AoM47dSZZhHfGVp6nbiXXXSAKMZxq8EbtCWpzxj4eipN0  AoM47dSZZhHfGVp6nbiXXXSAKMZxq8EbtCWpzxj4eipN  0x0732135dcce723c5f48d03a527068f1d1f6b7fd318c3afcbf2927e1ee26222cb   344521315            1780570491444         8            0  f5ea2b3749c65d6e56507cc35388719aadb28f9cab873696a2f8687f5c785138  0xc8736204d12f0a7277c86388a68bf8a194b0a14c5538ad13f22cbd8e2a38028a  0xd230c19f80e435fd0b8e1d67a43c75744bd2213923e47db381b96abe2ad6f832  0x0732135dcce723c5f48d03a527068f1d1f6b7fd318c3afcbf2927e1ee26222cb  0x0732135dcce723c5f48d03a527068f1d1f6b7fd318c3afcbf2927e1ee26222cb  e95040085976bfd54a1a07225cd46c8a2b4e8e2b6732f140a0fc49850ba73e1a::dusdc::DUSDC  0xc939545da6c2e8a3bdf484a0244f8da2af06cc476eb4ed94f537a221e806c13c  1780541100000  63247000000000   True   1000000  1000000  1000000000        True 2026-06-04 10:54:51.444
+1  4mnr1ssxS7wfQnx3ouaBzDBL7bhHpfTNu7ohTkeEL4Fm0  4mnr1ssxS7wfQnx3ouaBzDBL7bhHpfTNu7ohTkeEL4Fm  0xf12e09cf754806c413de9cc52ecdccfdcdf18de0088e2ac3dc15241107c6093f   344513006            1780568436482         7            0  f5ea2b3749c65d6e56507cc35388719aadb28f9cab873696a2f8687f5c785138  0xc8736204d12f0a7277c86388a68bf8a194b0a14c5538ad13f22cbd8e2a38028a  0xbe40cdbc29aafa382015a62587de021b5dcd2516c5ef3cf2c1bd0f7745c85eba  0xf12e09cf754806c413de9cc52ecdccfdcdf18de0088e2ac3dc15241107c6093f  0xf12e09cf754806c413de9cc52ecdccfdcdf18de0088e2ac3dc15241107c6093f  e95040085976bfd54a1a07225cd46c8a2b4e8e2b6732f140a0fc49850ba73e1a::dusdc::DUSDC  0xb79524498a9947307e192d8045772150dc47aade4f9e09bd4b6fe3236b9e3125  1780646400000  63700000000000   True   2000000   630099   315049500       False 2026-06-04 10:20:36.482
+
+Settled oracles in our sample: 333
+Total premium collected:  $11,391.28
+Total payouts owed:       $8,727.71
+Net pool PnL:             $2,663.57
+Avg PnL per expiry:       $7.9987
+# expiries with positive: 195
+# expiries with negative: 137
+Saved house-edge chart to backtest/out_house_edge.png
+
+Vault NAV change:        $12,475.83
+Sum of per-expiry PnL:   $2,663.57
+(These won't match exactly because LP supply/withdrawal also moves NAV,
+ and some expiries are still unsettled. Order of magnitude is what matters.)
+ scale  apy_pct  max_dd_pct  final_pnl_usd
+     1   2.2053     -0.0493     2,663.5729
+     5  11.4594     -0.2459    13,317.8645
+    10  24.0561     -0.4903    26,635.7290
+    25  69.6627     -1.2143    66,589.3224
+    50 178.7819     -2.3913   133,178.6448
+   100 593.4176     -4.6406   266,357.2896
+
+Saved volume-scale chart to backtest/out_volume_scale.png
+
+Minimum scale needed for 14% APY (naked, no hedge): 10×
+ATM 30-min binary, vol=50%: UP=0.4992 (should be ≈0.50)
+OTM +1%   30-min, vol=50%: UP=0.0042
+OTM -1%   30-min, vol=50%: DOWN=0.0039
+
+Saved BS validation chart to backtest/out_bs_validation.png
+  Sample size: 200
+  Mean actual price: 0.513
+  Mean model price:  0.497
+
+Loading spot-at-activation for each useful oracle...
+Loaded 403 oracles' starting spot
+
+Dynamic-hedge comparison vs fixed hedge at scale=50×...
+  Synthesized utilization: mean=16.99%  p95=39.66%  max=68.14%
+
+Strategy comparison at scale=50× under synthesized mainnet utilization:
+
+strategy  apy_pct  max_dd_pct  net_hedge_drag
+   naked 178.1916     -2.3913          0.0000
+fixed 2% 177.6175     -2.3967       -285.3881
+fixed 5% 176.7582     -2.4047       -713.4703
+ dynamic 176.9310     -2.4019       -627.2831
+
+Running hedged-vault grid search (annual budget semantics)...
+
+Hedged Vault — APY and Drawdown at 2% OTM wings (annual budget):
+
+ scale  annual_hedge_pct  sigma_distance  apy_pct  max_dd_pct      final_nav  total_pool_pnl  total_hedge_cost  total_hedge_payout  net_hedge_drag
+     1            0.0000          0.0200   2.2004     -0.0493 1,002,657.7160      2,657.7160            0.0000              0.0000          0.0000
+     1            0.0200          0.0200   1.9621     -0.0548 1,002,372.3279      2,657.7160          376.7123             91.3242       -285.3881
+     1            0.0500          0.0200   1.6055     -0.0637 1,001,944.2457      2,657.7160          941.7808            228.3105       -713.4703
+     1            0.1000          0.0200   1.0138     -0.0793 1,001,230.7754      2,657.7160        1,883.5616            456.6210     -1,426.9406
+     1            0.2000          0.0200  -0.1607     -0.1120   999,803.8347      2,657.7160        3,767.1233            913.2420     -2,853.8813
+    10            0.0000          0.0200  23.9980     -0.4903 1,026,577.1602     26,577.1602            0.0000              0.0000          0.0000
+    10            0.0200          0.0200  23.7156     -0.4957 1,026,291.7721     26,577.1602          376.7123             91.3242       -285.3881
+    10            0.0500          0.0200  23.2931     -0.5039 1,025,863.6899     26,577.1602          941.7808            228.3105       -713.4703
+    10            0.1000          0.0200  22.5917     -0.5176 1,025,150.2196     26,577.1602        1,883.5616            456.6210     -1,426.9406
+    10            0.2000          0.0200  21.1994     -0.5453 1,023,723.2789     26,577.1602        3,767.1233            913.2420     -2,853.8813
+    50            0.0000          0.0200 178.1916     -2.3913 1,132,885.8010    132,885.8010            0.0000              0.0000          0.0000
+    50            0.0200          0.0200 177.6175     -2.3967 1,132,600.4128    132,885.8010          376.7123             91.3242       -285.3881
+    50            0.0500          0.0200 176.7582     -2.4047 1,132,172.3306    132,885.8010          941.7808            228.3105       -713.4703
+    50            0.1000          0.0200 175.3312     -2.4181 1,131,458.8603    132,885.8010        1,883.5616            456.6210     -1,426.9406
+    50            0.2000          0.0200 172.4967     -2.4449 1,130,031.9197    132,885.8010        3,767.1233            913.2420     -2,853.8813
+   100            0.0000          0.0200 590.7921     -4.6406 1,265,771.6019    265,771.6019            0.0000              0.0000          0.0000
+   100            0.0200          0.0200 589.5160     -4.6458 1,265,486.2138    265,771.6019          376.7123             91.3242       -285.3881
+   100            0.0500          0.0200 587.6056     -4.6536 1,265,058.1316    265,771.6019          941.7808            228.3105       -713.4703
+   100            0.1000          0.0200 584.4320     -4.6667 1,264,344.6613    265,771.6019        1,883.5616            456.6210     -1,426.9406
+   100            0.2000          0.0200 578.1233     -4.6929 1,262,917.7206    265,771.6019        3,767.1233            913.2420     -2,853.8813
+
+Saved hedged NAV curves to backtest/out_hedged_nav.png
+
+--- Stress test: 10% of expiries see BTC -5% crash ---
+  Without hedge:  DD -7.42%, final NAV $967,012
+  With 5% hedge:  DD -7.39%, final NAV $967,240
+Saved stress-test chart to backtest/out_stress_test.png
+
+=== Strategy stress comparison (10% expiries see BTC -5%, scale=50×) ===
+ strategy  max_dd_pct  final_nav
+    naked       -7.42 967,011.86
+ fixed 2%       -7.41 967,103.18
+ fixed 5%       -7.39 967,240.17
+fixed 10%       -7.37 967,468.48
+  dynamic       -7.25 969,001.01
+
+============================================================
+ Phase A FINAL SUMMARY
+============================================================
+
+Settled-with-bets oracles:   333
+Period covered:               44 days
+Total premium collected:      $11,391.28
+Total payouts owed:           $8,727.71
+Net pool PnL:                 $2,663.57
+Gross house edge:             23.38%
+
+Naked PLP scaling:
+  Scale   1×:   APY    2.21%   DD  -0.05%
+  Scale   5×:   APY   11.46%   DD  -0.25%
+  Scale  10×:   APY   24.06%   DD  -0.49%
+  Scale  25×:   APY   69.66%   DD  -1.21%
+  Scale  50×:   APY  178.78%   DD  -2.39%
+  Scale 100×:   APY  593.42%   DD  -4.64%
+
+Hedged vault (2% OTM wings, annual budget):
+  Scale   1×, annual hedge   0%: APY    2.20%   DD  -0.05%   hedge_drag $         0
+  Scale   1×, annual hedge   2%: APY    1.96%   DD  -0.05%   hedge_drag $      -285
+  Scale   1×, annual hedge   5%: APY    1.61%   DD  -0.06%   hedge_drag $      -713
+  Scale   1×, annual hedge  10%: APY    1.01%   DD  -0.08%   hedge_drag $    -1,427
+  Scale   1×, annual hedge  20%: APY   -0.16%   DD  -0.11%   hedge_drag $    -2,854
+  Scale  10×, annual hedge   0%: APY   24.00%   DD  -0.49%   hedge_drag $         0
+  Scale  10×, annual hedge   2%: APY   23.72%   DD  -0.50%   hedge_drag $      -285
+  Scale  10×, annual hedge   5%: APY   23.29%   DD  -0.50%   hedge_drag $      -713
+  Scale  10×, annual hedge  10%: APY   22.59%   DD  -0.52%   hedge_drag $    -1,427
+  Scale  10×, annual hedge  20%: APY   21.20%   DD  -0.55%   hedge_drag $    -2,854
+  Scale  50×, annual hedge   0%: APY  178.19%   DD  -2.39%   hedge_drag $         0
+  Scale  50×, annual hedge   2%: APY  177.62%   DD  -2.40%   hedge_drag $      -285
+  Scale  50×, annual hedge   5%: APY  176.76%   DD  -2.40%   hedge_drag $      -713
+  Scale  50×, annual hedge  10%: APY  175.33%   DD  -2.42%   hedge_drag $    -1,427
+  Scale  50×, annual hedge  20%: APY  172.50%   DD  -2.44%   hedge_drag $    -2,854
+  Scale 100×, annual hedge   0%: APY  590.79%   DD  -4.64%   hedge_drag $         0
+  Scale 100×, annual hedge   2%: APY  589.52%   DD  -4.65%   hedge_drag $      -285
+  Scale 100×, annual hedge   5%: APY  587.61%   DD  -4.65%   hedge_drag $      -713
+  Scale 100×, annual hedge  10%: APY  584.43%   DD  -4.67%   hedge_drag $    -1,427
+  Scale 100×, annual hedge  20%: APY  578.12%   DD  -4.69%   hedge_drag $    -2,854
+
+Stress test (10% of expiries see BTC -5%):
+  Naked:   DD  -7.42%
+  Hedged:  DD  -7.39%
+
+VERDICT:
+  ✓ Build vault: at 100× scale with 0%/yr hedge → 590.8% APY, -4.64% DD
+(.venv) keshav@Keshavs-MacBook-Pro backtest % 

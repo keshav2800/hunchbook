@@ -1,0 +1,10 @@
+[package]
+name = "hunchbook_router"
+edition = "2024.beta"
+version = "0.0.1"
+
+[dependencies]
+deepbook_predict = { local = "../../deepbookv3-src/packages/predict" }
+
+[addresses]
+hunchbook_router = "0x0"

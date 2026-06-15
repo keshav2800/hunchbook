@@ -1,0 +1,230 @@
+<h2>Polymarket UI, PredictFeed content</h2>
+<p class="subtitle">Same layout, colors, and density as Polymarket — content swapped to crypto price predictions + vault.</p>
+
+<div class="mockup" style="margin-top:16px;">
+  <div class="mockup-header">Preview: Dashboard (desktop)</div>
+  <div class="mockup-body" style="padding:0;background:#0b131c;font-family:Inter,system-ui,sans-serif;">
+
+    <!-- top nav (polymarket style) -->
+    <div style="display:flex;align-items:center;gap:16px;padding:13px 24px;background:#0b131c;border-bottom:1px solid #1a2530;">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <div style="width:24px;height:24px;border-radius:6px;background:#4da2ff;display:flex;align-items:center;justify-content:center;color:#0b131c;font-weight:800;font-size:13px;">P</div>
+        <span style="color:#fff;font-weight:700;font-size:16px;letter-spacing:-.02em;">PredictFeed</span>
+      </div>
+      <div style="flex:1;max-width:430px;background:#141f2b;border:1px solid #233140;border-radius:8px;padding:9px 14px;color:#5d7287;font-size:13px;display:flex;justify-content:space-between;">
+        <span>🔍&nbsp; Search markets...</span><span style="color:#3a4a5a;">/</span>
+      </div>
+      <span style="color:#4da2ff;font-size:13px;font-weight:600;">ⓘ How it works</span>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:14px;">
+        <span style="color:#c8d4e0;font-size:13px;font-weight:600;">Log In</span>
+        <span style="background:#4da2ff;color:#fff;font-size:13px;font-weight:700;padding:8px 18px;border-radius:8px;">Sign Up</span>
+        <span style="color:#c8d4e0;">☰</span>
+      </div>
+    </div>
+
+    <!-- category tabs row -->
+    <div style="display:flex;gap:22px;padding:12px 24px;border-bottom:1px solid #141d26;align-items:center;font-size:13.5px;">
+      <span style="color:#fff;font-weight:600;">📈 Trending</span>
+      <span style="color:#ffb24d;font-weight:600;">⚡ 5-Min</span>
+      <span style="color:#8295a7;">Hourly</span>
+      <span style="color:#8295a7;">Daily</span>
+      <span style="color:#2a3845;">|</span>
+      <span style="color:#8295a7;">Bitcoin</span>
+      <span style="color:#8295a7;">Ethereum</span>
+      <span style="color:#8295a7;">Solana</span>
+      <span style="color:#8295a7;">SUI</span>
+      <span style="color:#2a3845;">|</span>
+      <span style="color:#63f5ef;font-weight:600;">💰 Earn</span>
+      <span style="color:#8295a7;">Leaderboard</span>
+    </div>
+
+    <!-- main row: featured market card + right rail -->
+    <div style="display:flex;gap:20px;padding:20px 24px;">
+
+      <!-- featured market (polymarket hero card) -->
+      <div style="flex:2.2;background:#101b26;border:1px solid #1c2936;border-radius:14px;padding:20px;">
+        <div style="display:flex;gap:12px;align-items:flex-start;">
+          <div style="width:44px;height:44px;border-radius:10px;background:#f7931a22;display:flex;align-items:center;justify-content:center;font-size:22px;">₿</div>
+          <div style="flex:1;">
+            <div style="color:#8295a7;font-size:12px;">Crypto · Bitcoin · expires 16:00 UTC</div>
+            <div style="color:#fff;font-weight:700;font-size:21px;letter-spacing:-.02em;margin-top:2px;">BTC above $104,500?</div>
+          </div>
+          <span style="color:#8295a7;font-size:13px;">🔗 🔖</span>
+        </div>
+
+        <div style="display:flex;gap:24px;margin-top:16px;">
+          <!-- left: outcomes -->
+          <div style="width:215px;">
+            <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #1a2530;">
+              <span style="color:#e6edf3;font-size:14px;font-weight:600;">Up</span>
+              <span style="color:#fff;font-size:16px;font-weight:700;">62%</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #1a2530;">
+              <span style="color:#e6edf3;font-size:14px;font-weight:600;">Down</span>
+              <span style="color:#fff;font-size:16px;font-weight:700;">38%</span>
+            </div>
+            <div style="margin-top:12px;display:flex;flex-direction:column;gap:6px;color:#8295a7;font-size:11.5px;">
+              <div>💬 <b style="color:#c8d4e0;">trader_42</b> — easy up, funding flipped</div>
+              <div>💬 <b style="color:#c8d4e0;">suiwhale</b> — fading this, resistance at 104.8</div>
+              <div>💬 <b style="color:#c8d4e0;">degen.eth</b> — YOLO tier or nothing</div>
+            </div>
+            <div style="color:#5d7287;font-size:12px;margin-top:12px;">$48.2K Vol · spot $104,231</div>
+          </div>
+          <!-- right: price chart -->
+          <div style="flex:1;">
+            <div style="display:flex;gap:14px;font-size:11.5px;margin-bottom:6px;">
+              <span style="color:#4da2ff;">● BTC spot 104,231</span>
+              <span style="color:#8295a7;">— strike 104,500</span>
+            </div>
+            <svg viewBox="0 0 340 110" style="width:100%;height:110px;">
+              <line x1="0" y1="38" x2="340" y2="38" stroke="#2a3845" stroke-width="1" stroke-dasharray="4 4"/>
+              <text x="300" y="33" fill="#5d7287" font-size="8">strike</text>
+              <path d="M0,80 L25,76 L50,82 L75,70 L100,74 L125,60 L150,65 L175,52 L200,58 L225,45 L250,50 L275,42 L300,48 L320,44 L340,46" fill="none" stroke="#4da2ff" stroke-width="2"/>
+              <line x1="0" y1="104" x2="340" y2="104" stroke="#1a2530" stroke-width="1"/>
+              <text x="0" y="100" fill="#5d7287" font-size="8">12:00</text>
+              <text x="160" y="100" fill="#5d7287" font-size="8">14:00</text>
+              <text x="318" y="100" fill="#5d7287" font-size="8">now</text>
+              <text x="330" y="60" fill="#8295a7" font-size="8">100%</text>
+            </svg>
+            <!-- buy buttons row -->
+            <div style="display:flex;gap:10px;margin-top:12px;">
+              <div style="flex:1;background:#1f3b2c;border:1px solid #27ae60;border-radius:8px;padding:10px;text-align:center;color:#2ecc71;font-weight:700;font-size:14px;">Buy Up 62¢ → 1.61×</div>
+              <div style="flex:1;background:#3b2026;border:1px solid #e05260;border-radius:8px;padding:10px;text-align:center;color:#ff6b6b;font-weight:700;font-size:14px;">Buy Down 38¢ → 2.63×</div>
+            </div>
+            <div style="display:flex;gap:8px;margin-top:10px;align-items:center;">
+              <span style="color:#5d7287;font-size:11px;">Vibes:</span>
+              <span style="background:#141f2b;border:1px solid #233140;color:#c8d4e0;font-size:11px;font-weight:600;padding:4px 12px;border-radius:6px;">SAFE 1.2×</span>
+              <span style="background:#141f2b;border:1px solid #233140;color:#c8d4e0;font-size:11px;font-weight:600;padding:4px 12px;border-radius:6px;">SPICY 4×</span>
+              <span style="background:#141f2b;border:1px solid #233140;color:#c8d4e0;font-size:11px;font-weight:600;padding:4px 12px;border-radius:6px;">YOLO 12×</span>
+              <span style="color:#4da2ff;font-size:11px;font-weight:600;margin-left:auto;">Custom strike · Range →</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- right rail (polymarket: breaking news / hot topics) -->
+      <div style="flex:1;min-width:260px;">
+        <div style="color:#fff;font-weight:700;font-size:16px;margin-bottom:12px;">Expiring soon ›</div>
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <div style="color:#c8d4e0;font-size:13px;"><b style="color:#5d7287;">1</b>&nbsp; BTC above $104,500 by 16:00?</div>
+            <div style="text-align:right;"><div style="color:#fff;font-weight:700;font-size:15px;">62%</div><div style="color:#2ecc71;font-size:10px;">↗ 8%</div></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <div style="color:#c8d4e0;font-size:13px;"><b style="color:#5d7287;">2</b>&nbsp; ETH above $3,900 by 16:00?</div>
+            <div style="text-align:right;"><div style="color:#fff;font-weight:700;font-size:15px;">45%</div><div style="color:#ff6b6b;font-size:10px;">↘ 5%</div></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <div style="color:#c8d4e0;font-size:13px;"><b style="color:#5d7287;">3</b>&nbsp; SUI above $4.90 by 17:00?</div>
+            <div style="text-align:right;"><div style="color:#fff;font-weight:700;font-size:15px;">71%</div><div style="color:#2ecc71;font-size:10px;">↗ 12%</div></div>
+          </div>
+        </div>
+
+        <div style="border-top:1px solid #1a2530;margin:16px 0;"></div>
+
+        <div style="color:#fff;font-weight:700;font-size:16px;margin-bottom:12px;">Earn vault ›</div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div style="display:flex;justify-content:space-between;"><span style="color:#c8d4e0;font-size:13px;">7d APY*</span><span style="color:#2ecc71;font-weight:700;font-size:14px;">11.2%</span></div>
+          <div style="display:flex;justify-content:space-between;"><span style="color:#c8d4e0;font-size:13px;">TVL</span><span style="color:#fff;font-weight:700;font-size:14px;">$48.2K</span></div>
+          <div style="display:flex;justify-content:space-between;"><span style="color:#c8d4e0;font-size:13px;">Max drawdown 30d</span><span style="color:#fff;font-weight:700;font-size:14px;">−0.4%</span></div>
+          <div style="background:#4da2ff;color:#fff;font-weight:700;font-size:13px;text-align:center;padding:10px;border-radius:8px;margin-top:4px;">Deposit dUSDC</div>
+          <div style="color:#5d7287;font-size:10px;">*variable · hedged · can be negative</div>
+        </div>
+
+        <div style="border-top:1px solid #1a2530;margin:16px 0;"></div>
+
+        <div style="color:#fff;font-weight:700;font-size:16px;margin-bottom:12px;">Top streaks ›</div>
+        <div style="display:flex;flex-direction:column;gap:8px;font-size:13px;">
+          <div style="display:flex;justify-content:space-between;"><span style="color:#c8d4e0;"><b style="color:#5d7287;">1</b>&nbsp; 0xa4…9f2</span><span style="color:#ffb24d;font-weight:700;">21 🔥</span></div>
+          <div style="display:flex;justify-content:space-between;"><span style="color:#c8d4e0;"><b style="color:#5d7287;">2</b>&nbsp; 0x7c…e01</span><span style="color:#ffb24d;font-weight:700;">14 🔥</span></div>
+          <div style="display:flex;justify-content:space-between;"><span style="color:#c8d4e0;"><b style="color:#5d7287;">3</b>&nbsp; 0x22…b8d</span><span style="color:#ffb24d;font-weight:700;">11 🔥</span></div>
+        </div>
+        <div style="background:#141f2b;border:1px solid #233140;color:#c8d4e0;font-weight:600;font-size:13px;text-align:center;padding:10px;border-radius:8px;margin-top:14px;">Explore all</div>
+      </div>
+    </div>
+
+    <!-- All markets grid -->
+    <div style="padding:6px 24px 24px;">
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:12px;">
+        <span style="color:#fff;font-weight:700;font-size:18px;">All markets</span>
+        <span style="margin-left:auto;color:#8295a7;font-size:13px;">🔍 ⚙ 🔖</span>
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:14px;font-size:12.5px;">
+        <span style="background:#1652f0;color:#fff;font-weight:600;padding:5px 14px;border-radius:6px;">All</span>
+        <span style="background:#141f2b;color:#8295a7;padding:5px 14px;border-radius:6px;">BTC 5-min</span>
+        <span style="background:#141f2b;color:#8295a7;padding:5px 14px;border-radius:6px;">BTC Hourly</span>
+        <span style="background:#141f2b;color:#8295a7;padding:5px 14px;border-radius:6px;">ETH Hourly</span>
+        <span style="background:#141f2b;color:#8295a7;padding:5px 14px;border-radius:6px;">SUI Daily</span>
+        <span style="background:#141f2b;color:#8295a7;padding:5px 14px;border-radius:6px;">Range bets</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;">
+
+        <div style="background:#101b26;border:1px solid #1c2936;border-radius:12px;padding:14px;">
+          <div style="display:flex;gap:8px;align-items:center;">
+            <div style="width:30px;height:30px;border-radius:7px;background:#f7931a22;display:flex;align-items:center;justify-content:center;font-size:15px;">₿</div>
+            <div style="color:#e6edf3;font-size:12.5px;font-weight:600;line-height:1.3;">BTC Up or Down — 5m</div>
+            <div style="margin-left:auto;text-align:center;">
+              <div style="color:#2ecc71;font-weight:700;font-size:13px;">51%</div><div style="color:#5d7287;font-size:9px;">Up</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:6px;margin-top:12px;">
+            <span style="flex:1;background:#1f3b2c;color:#2ecc71;font-weight:700;font-size:11.5px;text-align:center;padding:7px;border-radius:6px;">Up</span>
+            <span style="flex:1;background:#3b2026;color:#ff6b6b;font-weight:700;font-size:11.5px;text-align:center;padding:7px;border-radius:6px;">Down</span>
+          </div>
+          <div style="color:#5d7287;font-size:10px;margin-top:8px;">$12.4K Vol · ⏱ 03:12</div>
+        </div>
+
+        <div style="background:#101b26;border:1px solid #1c2936;border-radius:12px;padding:14px;">
+          <div style="display:flex;gap:8px;align-items:center;">
+            <div style="width:30px;height:30px;border-radius:7px;background:#62688f33;display:flex;align-items:center;justify-content:center;font-size:15px;">Ξ</div>
+            <div style="color:#e6edf3;font-size:12.5px;font-weight:600;line-height:1.3;">ETH above $3,900 — 16:00</div>
+            <div style="margin-left:auto;text-align:center;">
+              <div style="color:#fff;font-weight:700;font-size:13px;">45%</div><div style="color:#5d7287;font-size:9px;">Up</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:6px;margin-top:12px;">
+            <span style="flex:1;background:#1f3b2c;color:#2ecc71;font-weight:700;font-size:11.5px;text-align:center;padding:7px;border-radius:6px;">Up 45¢</span>
+            <span style="flex:1;background:#3b2026;color:#ff6b6b;font-weight:700;font-size:11.5px;text-align:center;padding:7px;border-radius:6px;">Down 55¢</span>
+          </div>
+          <div style="color:#5d7287;font-size:10px;margin-top:8px;">$8.1K Vol · ⏱ 04:32</div>
+        </div>
+
+        <div style="background:#101b26;border:1px solid #1c2936;border-radius:12px;padding:14px;">
+          <div style="display:flex;gap:8px;align-items:center;">
+            <div style="width:30px;height:30px;border-radius:7px;background:#4da2ff22;display:flex;align-items:center;justify-content:center;font-size:15px;">💧</div>
+            <div style="color:#e6edf3;font-size:12.5px;font-weight:600;line-height:1.3;">SUI above $4.90 — 17:00</div>
+            <div style="margin-left:auto;text-align:center;">
+              <div style="color:#2ecc71;font-weight:700;font-size:13px;">71%</div><div style="color:#5d7287;font-size:9px;">Up</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:6px;margin-top:12px;">
+            <span style="flex:1;background:#1f3b2c;color:#2ecc71;font-weight:700;font-size:11.5px;text-align:center;padding:7px;border-radius:6px;">Up 71¢</span>
+            <span style="flex:1;background:#3b2026;color:#ff6b6b;font-weight:700;font-size:11.5px;text-align:center;padding:7px;border-radius:6px;">Down 29¢</span>
+          </div>
+          <div style="color:#5d7287;font-size:10px;margin-top:8px;">$3.7K Vol · ⏱ 05:47</div>
+        </div>
+
+        <div style="background:#101b26;border:1px solid #1c2936;border-radius:12px;padding:14px;">
+          <div style="display:flex;gap:8px;align-items:center;">
+            <div style="width:30px;height:30px;border-radius:7px;background:#f7931a22;display:flex;align-items:center;justify-content:center;font-size:15px;">₿</div>
+            <div style="color:#e6edf3;font-size:12.5px;font-weight:600;line-height:1.3;">BTC in $103k–$106k range — Fri</div>
+            <div style="margin-left:auto;text-align:center;">
+              <div style="color:#fff;font-weight:700;font-size:13px;">58%</div><div style="color:#5d7287;font-size:9px;">In</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:6px;margin-top:12px;">
+            <span style="flex:1;background:#1f3b2c;color:#2ecc71;font-weight:700;font-size:11.5px;text-align:center;padding:7px;border-radius:6px;">In 58¢</span>
+            <span style="flex:1;background:#3b2026;color:#ff6b6b;font-weight:700;font-size:11.5px;text-align:center;padding:7px;border-radius:6px;">Out 42¢</span>
+          </div>
+          <div style="color:#5d7287;font-size:10px;margin-top:8px;">$5.9K Vol · ⏱ 2d 04h</div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="section" style="margin-top:24px;">
+  <p class="subtitle">Differences from real Polymarket, driven by our product: outcomes are <b>Up/Down vs a strike</b> (not event Yes/No), every market has an <b>expiry countdown</b>, the featured card shows <b>spot price vs strike line</b> instead of probability history, vibe tiers (SAFE/SPICY/YOLO) sit under the buy buttons, and the right rail carries <b>Expiring soon + Earn vault + Top streaks</b> instead of news. Sui blue is used only as the accent color where Polymarket uses its blue.</p>
+</div>

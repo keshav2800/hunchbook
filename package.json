@@ -1,0 +1,20 @@
+{
+  "name": "hunchbook",
+  "version": "0.0.1",
+  "private": true,
+  "packageManager": "pnpm@10.15.1",
+  "scripts": {
+    "phase0": "pnpm --filter @hunchbook/scripts phase0",
+    "phase1": "pnpm --filter @hunchbook/scripts phase1",
+    "fund-bot-wallet": "pnpm --filter @hunchbook/scripts fund-bot-wallet",
+    "bot:dev": "pnpm --filter @hunchbook/bot dev",
+    "bot:start": "pnpm --filter @hunchbook/bot start",
+    "web:dev": "pnpm --filter @hunchbook/web dev",
+    "web:build": "pnpm --filter @hunchbook/web build",
+    "web:lint": "pnpm --filter @hunchbook/web lint",
+    "web:typecheck": "pnpm --filter @hunchbook/web typecheck"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": ["better-sqlite3"]
+  }
+}

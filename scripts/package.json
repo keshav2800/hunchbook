@@ -1,0 +1,22 @@
+{
+  "name": "@hunchbook/scripts",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "phase0": "tsx src/phase0-roundtrip.ts",
+    "phase1": "tsx src/phase1-router-roundtrip.ts",
+    "fund-bot-wallet": "tsx src/fund-bot-wallet.ts",
+    "keeper": "tsx src/keeper.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@mysten/sui": "^1.30.0",
+    "@hunchbook/shared": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.5",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.3"
+  }
+}

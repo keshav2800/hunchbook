@@ -1,0 +1,15 @@
+node_modules/
+dist/
+.next/
+build/
+.turbo/
+.env
+.env.local
+*.log
+.DS_Store
+# local databases (contain user data — never commit)
+*.db
+*.sqlite
+data/
+# vendored upstream protocol (has its own git history)
+deepbookv3-src/
