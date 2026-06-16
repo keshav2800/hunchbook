@@ -20,7 +20,7 @@ Core trading loop, account/stats, and the **full hedged PLP vault** (deposit/wit
 - [x] **Fix layout when an active bet exists** — chart now fills its card (flex-1 + h-full), so the columns stay flush instead of padding out a gap
 - [ ] **Decide what to do with the market cards row** at the bottom of the trade page
 - [ ] **Improve the Launch Token page** (`/launch`)
-- [ ] **Add a "How it works"** explainer (Polymarket-style)
+- [x] **Add a "How it works"** explainer — guided wizard: intent chooser (Predict/Earn) with DeepBook-style framed generative art, then 3 illustrated BTC steps per path with confetti payoff; opens from a nav help icon (hover tooltip) + mobile menu item
 - [ ] **Improve leaderboard design**
 - [ ] **Record the platform demo video** (3-min, for submission)
 

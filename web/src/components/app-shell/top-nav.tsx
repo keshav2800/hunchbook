@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { usePathname } from 'next/navigation';
-import { Waves } from 'lucide-react';
+import { HelpCircle, Waves } from 'lucide-react';
 import { motion } from 'motion/react';
 import {
   Navbar,
@@ -15,6 +15,8 @@ import {
 } from '@/components/ui/resizable-navbar';
 import { AccountBar } from '@/components/account/account-bar';
 import { MarketSearch } from '@/components/app-shell/market-search';
+import { HowItWorks } from '@/components/how-it-works/how-it-works-dialog';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 
 const NAV_ITEMS = [
@@ -74,20 +76,37 @@ function NavTabs({ pathname }: { pathname: string }) {
 export function TopNav() {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [helpOpen, setHelpOpen] = useState(false);
 
   return (
-    <Navbar>
-      {/* Desktop: transparent full-width bar with boxed groups that shrinks
-          into a floating blurred island on scroll. */}
-      <NavBody>
-        <Brand />
-        <NavTabs pathname={pathname} />
-        <MarketSearch className="ml-auto w-full max-w-md flex-1" />
-        <AccountBar />
-      </NavBody>
+    <>
+      <Navbar>
+        {/* Desktop: transparent full-width bar with boxed groups that shrinks
+            into a floating blurred island on scroll. */}
+        <NavBody>
+          <Brand />
+          <NavTabs pathname={pathname} />
+          <MarketSearch className="ml-auto w-full max-w-md flex-1" />
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                type="button"
+                onClick={() => setHelpOpen(true)}
+                aria-label="How it works"
+                className="hidden size-9 shrink-0 items-center justify-center rounded-xl border border-white/5 bg-[#17191e]/95 text-muted-foreground transition-colors hover:bg-[#2b2e35] hover:text-foreground lg:flex"
+              >
+                <HelpCircle className="size-5" />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent side="bottom" sideOffset={8}>
+              How it works
+            </TooltipContent>
+          </Tooltip>
+          <AccountBar />
+        </NavBody>
 
-      {/* Mobile */}
-      <MobileNav>
+        {/* Mobile */}
+        <MobileNav>
           <MobileNavHeader>
             <Brand />
             <div className="flex items-center gap-2">
@@ -117,8 +136,22 @@ export function TopNav() {
                 ) : null}
               </Link>
             ))}
+            <button
+              type="button"
+              onClick={() => {
+                setMenuOpen(false);
+                setHelpOpen(true);
+              }}
+              className="flex w-full items-center gap-1.5 rounded-lg px-3 py-2 font-mono text-xs uppercase tracking-wider text-muted-foreground hover:bg-white/5 hover:text-foreground"
+            >
+              <HelpCircle className="size-4" />
+              How it works
+            </button>
           </MobileNavMenu>
-      </MobileNav>
-    </Navbar>
+        </MobileNav>
+      </Navbar>
+
+      <HowItWorks open={helpOpen} onOpenChange={setHelpOpen} />
+    </>
   );
 }
