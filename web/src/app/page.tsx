@@ -165,7 +165,7 @@ function TradePageInner() {
               ) : null}
             </div>
           </CardHeader>
-          <CardContent>
+          <CardContent className="flex-1 min-h-0">
             {market ? (
               <PredictionChart
                 spots={market.sparkline}
@@ -180,9 +180,10 @@ function TradePageInner() {
                 label={market.pair}
                 onStrikeChange={(p) => setStrikeText(String(p))}
                 onRangeChange={(low, high) => setBand({ low, high })}
+                className="h-full min-h-[420px]"
               />
             ) : (
-              <Skeleton className="h-[420px] w-full" />
+              <Skeleton className="h-full min-h-[420px] w-full" />
             )}
           </CardContent>
         </Card>

@@ -13,6 +13,19 @@ Core trading loop, account/stats, and the **full hedged PLP vault** (deposit/wit
 
 ---
 
+## 📝 TODO — next session (logged 2026-06-14)
+- [ ] **Test auto-bet extensively** (Auto Studio `/strike`) — multiple rounds, stops, edge cases
+- [x] **Settlement mechanics** — answered: European-style, settles at **expiry only**. "Above $66,800" wins only if BTC is above $66,800 *at the settlement time*; intermediate moves don't count (not touch/American).
+- [x] **Is payout fixed at purchase?** — answered: **yes**. You lock in `units` (contracts) at the entry price; payout = `units × $1` fixed, odds locked at purchase. Win the fixed amount or lose stake (−1% fee).
+- [x] **Fix layout when an active bet exists** — chart now fills its card (flex-1 + h-full), so the columns stay flush instead of padding out a gap
+- [ ] **Decide what to do with the market cards row** at the bottom of the trade page
+- [ ] **Improve the Launch Token page** (`/launch`)
+- [ ] **Add a "How it works"** explainer (Polymarket-style)
+- [ ] **Improve leaderboard design**
+- [ ] **Record the platform demo video** (3-min, for submission)
+
+---
+
 ## ✅ Shipped
 
 ### Auth & infra
