@@ -10,6 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Countdown } from '@/components/countdown';
 import { RangeLadder } from '@/components/trade/range-ladder';
+import { RangeLadderHorizontal } from '@/components/trade/range-ladder-horizontal';
 import { formatNumber, formatPct, formatUsd } from '@/lib/format';
 import { binaryUpProbability, probabilityToOdds, rangeProbability } from '@/lib/svi';
 import type { LiveMarket } from '@/lib/types';
@@ -111,6 +112,7 @@ export function QuickBetPanel({
   onStrikeTextChange,
   band,
   onBandChange,
+  bare = false,
 }: {
   market?: LiveMarket;
   tab: Tab;
@@ -119,6 +121,9 @@ export function QuickBetPanel({
   onStrikeTextChange: (v: string) => void;
   band: { low: number; high: number };
   onBandChange: (b: { low: number; high: number }) => void;
+  // `bare` drops the Card chrome so the panel can live inside the mobile
+  // bottom sheet, which supplies its own surface + header.
+  bare?: boolean;
 }) {
   const [stake, setStake] = useState('100');
   const [ctaHover, setCtaHover] = useState(false);
@@ -128,16 +133,20 @@ export function QuickBetPanel({
   const now = useNowTicking();
 
   if (!market || strikeText === '') {
+    const skeletons = (
+      <div className="space-y-3">
+        <Skeleton className="h-10 w-full" />
+        <Skeleton className="h-10 w-full" />
+        <Skeleton className="h-10 w-full" />
+      </div>
+    );
+    if (bare) return skeletons;
     return (
       <Card>
         <CardHeader>
           <CardTitle>Quick Bet</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-3">
-          <Skeleton className="h-10 w-full" />
-          <Skeleton className="h-10 w-full" />
-          <Skeleton className="h-10 w-full" />
-        </CardContent>
+        <CardContent>{skeletons}</CardContent>
       </Card>
     );
   }
@@ -168,16 +177,8 @@ export function QuickBetPanel({
     minute: '2-digit',
   });
 
-  return (
-    <Card>
-      <CardHeader className="grid-cols-[1fr_auto] items-center">
-        <CardTitle className="uppercase">Quick Bet</CardTitle>
-        <Countdown
-          expiry={market.expiry}
-          className="rounded-lg border-white/10 bg-[#17191e] px-2.5 py-1.5"
-        />
-      </CardHeader>
-      <CardContent className="space-y-4">
+  const body = (
+    <div className="space-y-4">
         {/* ABOVE / RANGE / BELOW segmented tabs */}
         <div className="grid grid-cols-3 gap-1.5">
           {(['ABOVE', 'RANGE', 'BELOW'] as const).map((t) => (
@@ -203,14 +204,25 @@ export function QuickBetPanel({
           </div>
           {isRange ? (
             <>
-              <RangeLadder
-                spot={market.spot}
-                step={RANGE_STEP}
-                minStrike={market.minStrike}
-                lower={band.low}
-                upper={band.high}
-                onChange={(low, high) => onBandChange({ low, high })}
-              />
+              {bare ? (
+                <RangeLadderHorizontal
+                  spot={market.spot}
+                  step={RANGE_STEP}
+                  minStrike={market.minStrike}
+                  lower={band.low}
+                  upper={band.high}
+                  onChange={(low, high) => onBandChange({ low, high })}
+                />
+              ) : (
+                <RangeLadder
+                  spot={market.spot}
+                  step={RANGE_STEP}
+                  minStrike={market.minStrike}
+                  lower={band.low}
+                  upper={band.high}
+                  onChange={(low, high) => onBandChange({ low, high })}
+                />
+              )}
               <p className="text-sm text-muted-foreground">
                 Wins if BTC between {formatUsd(band.low, 0)} and {formatUsd(band.high, 0)} by{' '}
                 {expiryTime}
@@ -352,7 +364,36 @@ export function QuickBetPanel({
           </div>
           <FaucetButton />
         </div>
-      </CardContent>
+    </div>
+  );
+
+  if (bare) {
+    return (
+      <div className="space-y-4">
+        <div className="flex items-center justify-between gap-3">
+          <span className="font-heading text-base font-medium uppercase text-foreground">
+            Quick Bet
+          </span>
+          <Countdown
+            expiry={market.expiry}
+            className="rounded-lg border-white/10 bg-[#17191e] px-2.5 py-1.5"
+          />
+        </div>
+        {body}
+      </div>
+    );
+  }
+
+  return (
+    <Card>
+      <CardHeader className="grid-cols-[1fr_auto] items-center">
+        <CardTitle className="uppercase">Quick Bet</CardTitle>
+        <Countdown
+          expiry={market.expiry}
+          className="rounded-lg border-white/10 bg-[#17191e] px-2.5 py-1.5"
+        />
+      </CardHeader>
+      <CardContent>{body}</CardContent>
     </Card>
   );
 }

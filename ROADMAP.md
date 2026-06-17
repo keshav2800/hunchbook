@@ -22,6 +22,7 @@ Core trading loop, account/stats, and the **full hedged PLP vault** (deposit/wit
 - [ ] **Improve the Launch Token page** (`/launch`)
 - [x] **Add a "How it works"** explainer — guided wizard: intent chooser (Predict/Earn) with DeepBook-style framed generative art, then 3 illustrated BTC steps per path with confetti payoff; opens from a nav help icon (hover tooltip) + mobile menu item
 - [ ] **Improve leaderboard design**
+- [ ] **Optimise for small screens** — audit every page on mobile/narrow viewports (nav, markets board, trade columns, quick-bet panel, chart, vault, How-it-works dialog); fix overflow, cramped tap targets, and column stacking so the whole flow is usable on a phone
 - [ ] **Record the platform demo video** (3-min, for submission)
 
 ---

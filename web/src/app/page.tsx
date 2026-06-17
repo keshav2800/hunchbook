@@ -16,6 +16,7 @@ import { MarketsBoard, type BoardPick } from '@/components/trade/markets-board';
 import { ExpiryTabs } from '@/components/trade/expiry-tabs';
 import { QuickBetPanel, RANGE_STEP, type Tab } from '@/components/trade/quick-bet-panel';
 import { ActiveBetsCard } from '@/components/trade/active-bets-card';
+import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
 import { useLiveMarkets, useOraclePrices } from '@/lib/hooks';
 import type { LiveMarket } from '@/lib/types';
 import { formatPct, formatUsd } from '@/lib/format';
@@ -23,6 +24,22 @@ import { binaryUpProbability, probabilityToOdds, rangeProbability } from '@/lib/
 import { cn } from '@/lib/utils';
 
 const baseSymbol = (pair: string) => pair.split('/')[0];
+
+// `lg` (1024px) is where the Quick Bet panel docks beside the chart. Below it
+// the panel moves into a bottom sheet, so we gate the sheet's open-on-pick
+// behaviour on this. The fixed mobile bar is hidden by CSS (`lg:hidden`), so
+// the SSR-false initial value never flashes a stray bar on desktop.
+function useIsDesktop() {
+  const [isDesktop, setIsDesktop] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 1024px)');
+    const update = () => setIsDesktop(mq.matches);
+    update();
+    mq.addEventListener('change', update);
+    return () => mq.removeEventListener('change', update);
+  }, []);
+  return isDesktop;
+}
 
 function AssetIcon({ symbol }: { symbol: string }) {
   if (symbol === 'BTC') {
@@ -91,6 +108,9 @@ function TradePageInner() {
   const [strikeText, setStrikeText] = useState('');
   const [band, setBand] = useState({ low: 0, high: 0 });
   const [chartMinutes, setChartMinutes] = useState(15);
+  // Mobile bottom-sheet (bet panel) open state.
+  const [betOpen, setBetOpen] = useState(false);
+  const isDesktop = useIsDesktop();
 
   // User's explicit pick wins; otherwise the `?m=` deep link (from the global
   // search); otherwise the nearest market that isn't in its final pre-expiry
@@ -138,6 +158,9 @@ function TradePageInner() {
     setTab(p.tab);
     if (p.tab === 'RANGE') setBand(p.band);
     else setStrikeText(String(p.strike));
+    // On mobile the panel lives in a sheet — surface it so the pick is
+    // immediately actionable instead of silently loading off-screen.
+    if (!isDesktop) setBetOpen(true);
     window.scrollTo({ top: 0, behavior: 'smooth' });
     // Release after effects settle so future manual switches reseed normally.
     setTimeout(() => {
@@ -164,7 +187,7 @@ function TradePageInner() {
   const cents = mult > 0 ? Math.round(100 / mult) : null;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-24 lg:pb-0">
       {markets.isError ? (
         <div className="flex items-center gap-2 rounded-lg border border-warning/40 bg-warning/10 p-3 text-sm text-warning">
           <TriangleAlert className="size-4 shrink-0" />
@@ -203,7 +226,7 @@ function TradePageInner() {
         <Skeleton className="h-10 w-48 rounded-full" />
       )}
 
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
         <Card>
           <CardHeader className="flex-row flex-wrap items-center justify-between gap-3">
             <ExpiryTabs markets={assetMarkets} value={market?.oracleId} onSelect={setOracleId} />
@@ -245,7 +268,8 @@ function TradePageInner() {
           </CardContent>
         </Card>
 
-        <div className="space-y-6">
+        {/* Docked panel — beside the chart on lg+ (small laptops / big tablets). */}
+        <div className="hidden space-y-6 lg:block">
           <QuickBetPanel
             market={market}
             tab={tab}
@@ -259,7 +283,54 @@ function TradePageInner() {
         </div>
       </div>
 
+      {/* On mobile the bet panel moves into the bottom sheet, so active bets
+          take the full width here instead. */}
+      <div className="lg:hidden">
+        <ActiveBetsCard markets={markets.data} />
+      </div>
+
       <MarketsBoard markets={assetMarkets} defaultOracleId={market?.oracleId} onPick={handlePick} />
+
+      {/* Mobile bet bar — fixed to the bottom, opens the Quick Bet sheet. */}
+      <div
+        className="fixed inset-x-0 bottom-0 z-40 px-4 pt-3 lg:hidden"
+        style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 0.75rem)' }}
+      >
+        <button
+          type="button"
+          onClick={() => setBetOpen(true)}
+          disabled={!market}
+          className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-b from-[#3b82f6] to-[#1d59e0] font-mono text-xs font-semibold uppercase tracking-[0.2em] text-white shadow-[0px_1px_0px_0px_rgba(255,255,255,0.3)_inset] transition hover:brightness-110 disabled:opacity-50"
+        >
+          Place a bet
+          {cents != null ? (
+            <span className="font-sans tracking-normal text-white/80">· {cents}¢</span>
+          ) : null}
+        </button>
+      </div>
+
+      {/* Apple-style bottom sheet holding the full Quick Bet panel. */}
+      <Sheet open={betOpen} onOpenChange={setBetOpen}>
+        <SheetContent
+          side="bottom"
+          showCloseButton={false}
+          className="max-h-[90vh] overflow-y-auto rounded-t-2xl border-white/10 bg-card px-4 pt-3 ring-1 ring-white/10"
+          style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 1.25rem)' }}
+        >
+          <SheetTitle className="sr-only">Quick Bet</SheetTitle>
+          <div className="mx-auto h-1.5 w-12 shrink-0 rounded-full bg-white/15" />
+          <QuickBetPanel
+            bare
+            market={market}
+            tab={tab}
+            onTabChange={setTab}
+            strikeText={strikeText}
+            onStrikeTextChange={setStrikeText}
+            band={band}
+            onBandChange={setBand}
+          />
+        </SheetContent>
+      </Sheet>
     </div>
   );
 }
