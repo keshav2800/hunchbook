@@ -55,35 +55,38 @@ export function ExpiryTabs({
   const overflow = markets.filter((m) => !visible.includes(m));
 
   return (
-    <div className="flex w-max items-center gap-1.5">
-      {visible.map((m) => {
-        const active = m.oracleId === value;
-        return (
-          <button
-            key={m.oracleId}
-            type="button"
-            onClick={() => onSelect(m.oracleId)}
-            className={cn(
-              'flex h-9 items-center gap-2 rounded-lg border px-3 font-mono text-xs uppercase tracking-wider transition-colors',
-              active
-                ? 'border-transparent bg-gradient-to-b from-[#3b82f6] to-[#1d59e0] text-white shadow-[0px_1px_0px_0px_rgba(255,255,255,0.3)_inset]'
-                : 'border-white/10 bg-[#17191e] text-muted-foreground hover:bg-[#2b2e35] hover:text-foreground',
-            )}
-          >
-            <span>{expiryTabLabel(m.expiry)}</span>
-            {active ? (
-              <Countdown
-                expiry={m.expiry}
-                className="border-transparent !bg-transparent px-0 py-0 text-white/90"
-              />
-            ) : null}
-          </button>
-        );
-      })}
+    <div className="flex min-w-0 items-center gap-1.5">
+      {/* Pills scroll horizontally; "More" stays pinned so it's always reachable. */}
+      <div className="flex min-w-0 items-center gap-1.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        {visible.map((m) => {
+          const active = m.oracleId === value;
+          return (
+            <button
+              key={m.oracleId}
+              type="button"
+              onClick={() => onSelect(m.oracleId)}
+              className={cn(
+                'flex h-9 shrink-0 items-center gap-2 rounded-lg border px-3 font-mono text-xs uppercase tracking-wider transition-colors',
+                active
+                  ? 'border-transparent bg-gradient-to-b from-[#3b82f6] to-[#1d59e0] text-white shadow-[0px_1px_0px_0px_rgba(255,255,255,0.3)_inset]'
+                  : 'border-white/10 bg-[#17191e] text-muted-foreground hover:bg-[#2b2e35] hover:text-foreground',
+              )}
+            >
+              <span>{expiryTabLabel(m.expiry)}</span>
+              {active ? (
+                <Countdown
+                  expiry={m.expiry}
+                  className="border-transparent !bg-transparent px-0 py-0 text-white/90"
+                />
+              ) : null}
+            </button>
+          );
+        })}
+      </div>
 
       {overflow.length > 0 ? (
         <Select value={value ?? ''} onValueChange={onSelect}>
-          <SelectTrigger className="h-9 gap-1 rounded-lg border-white/10 bg-[#17191e] font-mono text-xs uppercase tracking-wider text-muted-foreground hover:bg-[#2b2e35] [&>svg]:hidden">
+          <SelectTrigger className="h-9 shrink-0 gap-1 rounded-lg border-white/10 bg-[#17191e] font-mono text-xs uppercase tracking-wider text-muted-foreground hover:bg-[#2b2e35] [&>svg]:hidden">
             <span className="flex items-center gap-1">
               More <ChevronDown className="size-3.5" />
             </span>

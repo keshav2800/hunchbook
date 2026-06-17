@@ -172,7 +172,9 @@ export function MarketsBoard({
     <div className="space-y-3">
       <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Markets</h2>
       {open.length > 0 ? (
-        <div className="flex flex-wrap gap-1.5">
+        // Small screens: cap at 2 rows and scroll horizontally instead of
+        // wrapping into a tall stack. md+ reverts to a normal wrapping row.
+        <div className="grid auto-cols-max grid-flow-col grid-rows-2 gap-1.5 overflow-x-auto [scrollbar-width:none] md:flex md:flex-wrap md:overflow-visible [&::-webkit-scrollbar]:hidden">
           {open.map((x) => {
             const active = x.oracleId === m?.oracleId;
             return (
@@ -181,7 +183,7 @@ export function MarketsBoard({
                 type="button"
                 onClick={() => setSel(x.oracleId)}
                 className={cn(
-                  'h-8 rounded-lg border px-2.5 font-mono text-xs uppercase tracking-wider transition-colors',
+                  'h-8 shrink-0 rounded-lg border px-2.5 font-mono text-xs uppercase tracking-wider transition-colors',
                   active
                     ? 'border-transparent bg-gradient-to-b from-[#3b82f6] to-[#1d59e0] text-white shadow-[0px_1px_0px_0px_rgba(255,255,255,0.3)_inset]'
                     : 'border-white/10 bg-[#17191e] text-muted-foreground hover:bg-[#2b2e35] hover:text-foreground',

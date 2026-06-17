@@ -198,7 +198,7 @@ function TradePageInner() {
       {/* Asset header pill */}
       {market ? (
         <Select value={market.pair} onValueChange={pickAsset}>
-          <SelectTrigger className="h-auto rounded-full border-white/10 bg-[#17191e] py-1.5 pr-2.5 pl-1.5 hover:bg-[#2b2e35]">
+          <SelectTrigger className="h-auto rounded-full border-white/10 bg-[#17191e] py-1.5 pr-2.5 pl-1.5 hover:bg-[#2b2e35] [&>svg]:hidden">
             <span className="flex items-center gap-2">
               <AssetIcon symbol={baseSymbol(market.pair)} />
               <span className="font-semibold">{baseSymbol(market.pair)}</span>
@@ -229,9 +229,9 @@ function TradePageInner() {
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
         <Card>
           <CardHeader className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
-            {/* Own scroll region so flicking through expiries never nudges the
-                chart below (the card itself is overflow-hidden). */}
-            <div className="-mx-1 min-w-0 overflow-x-auto px-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            {/* ExpiryTabs owns its own horizontal scroll (pills scroll, "More"
+                stays pinned), so this just lets the flex item shrink. */}
+            <div className="min-w-0">
               <ExpiryTabs markets={assetMarkets} value={market?.oracleId} onSelect={setOracleId} />
             </div>
             <div className="flex items-center gap-3">
@@ -332,6 +332,7 @@ function TradePageInner() {
             onStrikeTextChange={setStrikeText}
             band={band}
             onBandChange={setBand}
+            onPlaced={() => setBetOpen(false)}
           />
         </SheetContent>
       </Sheet>

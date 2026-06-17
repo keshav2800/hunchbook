@@ -113,6 +113,7 @@ export function QuickBetPanel({
   band,
   onBandChange,
   bare = false,
+  onPlaced,
 }: {
   market?: LiveMarket;
   tab: Tab;
@@ -124,6 +125,8 @@ export function QuickBetPanel({
   // `bare` drops the Card chrome so the panel can live inside the mobile
   // bottom sheet, which supplies its own surface + header.
   bare?: boolean;
+  // Fired after a bet lands — the mobile sheet uses this to close itself.
+  onPlaced?: () => void;
 }) {
   const [stake, setStake] = useState('100');
   const [ctaHover, setCtaHover] = useState(false);
@@ -346,6 +349,7 @@ export function QuickBetPanel({
                         pWin,
                       }
                     : { market, direction, strikeUsd: strike, stakeUsd: stakeNum, pWin },
+                  { onSuccess: () => onPlaced?.() },
                 )
               }
             >

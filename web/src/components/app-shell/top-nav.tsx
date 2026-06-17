@@ -134,12 +134,11 @@ export function TopNav() {
             <Link href="/" aria-label="Hunchbook home" className="flex h-11 shrink-0 items-center">
               <Image src="/hunchbook.png" alt="Hunchbook" width={44} height={44} priority className="size-11" />
             </Link>
-            <MarketSearch className="min-w-0 flex-1" />
             <button
               type="button"
               onClick={() => setHelpOpen(true)}
               aria-label="How it works"
-              className="flex size-11 shrink-0 items-center justify-center rounded-xl border border-white/5 bg-[#17191e]/95 text-muted-foreground transition-colors hover:bg-[#2b2e35] hover:text-foreground"
+              className="ml-auto flex size-11 shrink-0 items-center justify-center rounded-xl border border-white/5 bg-[#17191e]/95 text-muted-foreground transition-colors hover:bg-[#2b2e35] hover:text-foreground"
             >
               <HelpCircle className="size-5" />
             </button>
