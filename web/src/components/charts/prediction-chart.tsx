@@ -323,7 +323,7 @@ export function PredictionChart({
         // split) stay visible — widen the price scale to include them.
         autoscaleInfoProvider: (orig: () => AutoscaleInfo | null) => {
           const res = orig();
-          if (!res) return res;
+          if (!res?.priceRange) return res;
           const lo = Math.min(res.priceRange.minValue, lowerRef.current);
           const hi = Math.max(res.priceRange.maxValue, upperRef.current);
           const pad = (hi - lo) * 0.12 || 1;
