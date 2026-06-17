@@ -228,8 +228,12 @@ function TradePageInner() {
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
         <Card>
-          <CardHeader className="flex-row flex-wrap items-center justify-between gap-3">
-            <ExpiryTabs markets={assetMarkets} value={market?.oracleId} onSelect={setOracleId} />
+          <CardHeader className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+            {/* Own scroll region so flicking through expiries never nudges the
+                chart below (the card itself is overflow-hidden). */}
+            <div className="-mx-1 min-w-0 overflow-x-auto px-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              <ExpiryTabs markets={assetMarkets} value={market?.oracleId} onSelect={setOracleId} />
+            </div>
             <div className="flex items-center gap-3">
               <ChartRangeTabs value={chartMinutes} onChange={setChartMinutes} />
               <div className="flex items-baseline gap-2">

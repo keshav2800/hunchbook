@@ -55,7 +55,7 @@ export function ExpiryTabs({
   const overflow = markets.filter((m) => !visible.includes(m));
 
   return (
-    <div className="flex items-center gap-1.5">
+    <div className="flex w-max items-center gap-1.5">
       {visible.map((m) => {
         const active = m.oracleId === value;
         return (

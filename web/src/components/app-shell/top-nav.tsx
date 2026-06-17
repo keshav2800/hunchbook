@@ -11,10 +11,16 @@ import {
   NavBody,
   MobileNav,
   MobileNavHeader,
-  MobileNavMenu,
-  MobileNavToggle,
 } from '@/components/ui/resizable-navbar';
 import { AccountBar } from '@/components/account/account-bar';
+import { FloatingDock } from '@/components/ui/floating-dock';
+import {
+  TradeIcon,
+  BetsIcon,
+  StrikeIcon,
+  VaultIcon,
+  LeaderboardIcon,
+} from '@/components/app-shell/dock-icons';
 import { MarketSearch } from '@/components/app-shell/market-search';
 import { HowItWorks } from '@/components/how-it-works/how-it-works-dialog';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
@@ -29,16 +35,25 @@ const NAV_ITEMS = [
   { name: 'Launch', link: '/launch', badge: 'Soon' },
 ];
 
+// Primary destinations as a floating glass dock on small screens.
+const DOCK_ITEMS = [
+  { title: 'Trade', href: '/', icon: <TradeIcon /> },
+  { title: 'My Bets', href: '/bets', icon: <BetsIcon /> },
+  { title: 'Strike', href: '/strike', icon: <StrikeIcon /> },
+  { title: 'Vault', href: '/vault', icon: <VaultIcon /> },
+  { title: 'Leaderboard', href: '/leaderboard', icon: <LeaderboardIcon /> },
+];
+
 function Brand() {
   return (
-    <Link href="/" className="flex shrink-0 items-center gap-2">
+    <Link href="/" className="flex h-11 shrink-0 items-center gap-2">
       <Image
         src="/hunchbook.png"
         alt="Hunchbook"
-        width={40}
-        height={40}
+        width={44}
+        height={44}
         priority
-        className="size-10"
+        className="size-11"
       />
       <span className="text-lg font-semibold tracking-tight">HunchBook</span>
     </Link>
@@ -83,7 +98,6 @@ function NavTabs({ pathname }: { pathname: string }) {
 
 export function TopNav() {
   const pathname = usePathname();
-  const [menuOpen, setMenuOpen] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
 
   return (
@@ -101,7 +115,7 @@ export function TopNav() {
                 type="button"
                 onClick={() => setHelpOpen(true)}
                 aria-label="How it works"
-                className="hidden size-9 shrink-0 items-center justify-center rounded-xl border border-white/5 bg-[#17191e]/95 text-muted-foreground transition-colors hover:bg-[#2b2e35] hover:text-foreground lg:flex"
+                className="hidden size-11 shrink-0 items-center justify-center rounded-xl border border-white/5 bg-[#17191e]/95 text-muted-foreground transition-colors hover:bg-[#2b2e35] hover:text-foreground lg:flex"
               >
                 <HelpCircle className="size-5" />
               </button>
@@ -113,52 +127,39 @@ export function TopNav() {
           <AccountBar />
         </NavBody>
 
-        {/* Mobile */}
+        {/* Mobile: slim top bar (brand · search · help · account). The page
+            links live in the floating glass dock below. */}
         <MobileNav>
-          <MobileNavHeader>
-            <Brand />
-            <div className="flex items-center gap-2">
-              <AccountBar />
-              <MobileNavToggle isOpen={menuOpen} onClick={() => setMenuOpen(!menuOpen)} />
-            </div>
-          </MobileNavHeader>
-          <MobileNavMenu isOpen={menuOpen}>
-            <MarketSearch className="mb-2 w-full" />
-            {NAV_ITEMS.map((item) => (
-              <Link
-                key={item.link}
-                href={item.link}
-                onClick={() => setMenuOpen(false)}
-                className={cn(
-                  'flex w-full items-center gap-1.5 rounded-lg px-3 py-2 font-mono text-xs uppercase tracking-wider',
-                  pathname === item.link
-                    ? 'bg-white/10 text-foreground'
-                    : 'text-muted-foreground hover:bg-white/5 hover:text-foreground',
-                )}
-              >
-                {item.name}
-                {item.badge ? (
-                  <span className="rounded-full bg-accent px-1.5 text-[10px] font-semibold tracking-wider text-accent-foreground">
-                    {item.badge}
-                  </span>
-                ) : null}
-              </Link>
-            ))}
+          <MobileNavHeader className="gap-2">
+            <Link href="/" aria-label="Hunchbook home" className="flex h-11 shrink-0 items-center">
+              <Image src="/hunchbook.png" alt="Hunchbook" width={44} height={44} priority className="size-11" />
+            </Link>
+            <MarketSearch className="min-w-0 flex-1" />
             <button
               type="button"
-              onClick={() => {
-                setMenuOpen(false);
-                setHelpOpen(true);
-              }}
-              className="flex w-full items-center gap-1.5 rounded-lg px-3 py-2 font-mono text-xs uppercase tracking-wider text-muted-foreground hover:bg-white/5 hover:text-foreground"
+              onClick={() => setHelpOpen(true)}
+              aria-label="How it works"
+              className="flex size-11 shrink-0 items-center justify-center rounded-xl border border-white/5 bg-[#17191e]/95 text-muted-foreground transition-colors hover:bg-[#2b2e35] hover:text-foreground"
             >
-              <HelpCircle className="size-4" />
-              How it works
+              <HelpCircle className="size-5" />
             </button>
-          </MobileNavMenu>
+            <AccountBar />
+          </MobileNavHeader>
         </MobileNav>
       </Navbar>
 
+      {/* Floating glass dock — small-screen primary nav only (desktop uses the
+          top navbar). */}
+      <div className="fixed inset-x-0 bottom-4 z-50 flex justify-center px-4 lg:hidden">
+        <FloatingDock
+          items={DOCK_ITEMS}
+          // Force the full horizontal dock on phones too (override the
+          // component's `hidden md:flex`), and disable its collapse-to-one-icon
+          // mobile variant — we want every destination visible.
+          desktopClassName="flex border border-white/10 bg-white/5 shadow-2xl backdrop-blur-2xl dark:bg-white/5"
+          mobileClassName="hidden"
+        />
+      </div>
       <HowItWorks open={helpOpen} onOpenChange={setHelpOpen} />
     </>
   );

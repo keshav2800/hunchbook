@@ -1,6 +1,6 @@
 'use client';
 
-import { Droplets } from 'lucide-react';
+import Image from 'next/image';
 import { useCurrentAccount } from '@mysten/dapp-kit';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -74,7 +74,13 @@ export function AccountBar() {
         disabled={faucet.isPending}
         onClick={() => faucet.mutate()}
       >
-        <Droplets className="size-4 sm:hidden" />
+        <Image
+          src="/sui.jpg"
+          alt="Deposit"
+          width={24}
+          height={24}
+          className="size-6 rounded-full object-contain sm:hidden"
+        />
         <span className="hidden sm:inline">{faucet.isPending ? 'Sending…' : 'Deposit'}</span>
       </Button>
       <ProfileMenu />

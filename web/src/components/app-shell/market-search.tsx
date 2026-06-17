@@ -66,7 +66,7 @@ export function MarketSearch({ className }: { className?: string }) {
         }}
         placeholder="Search markets…"
         aria-label="Search markets"
-        className="h-9 w-full rounded-full border border-white/10 bg-white/[0.05] pl-10 pr-12 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring/60"
+        className="h-11 w-full rounded-full border border-white/10 bg-white/[0.05] pl-10 pr-12 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring/60"
       />
       <kbd className="pointer-events-none absolute right-3.5 top-1/2 hidden -translate-y-1/2 rounded border border-white/10 bg-white/[0.06] px-1.5 font-mono text-[10px] text-muted-foreground md:inline-block">
         ⌘K

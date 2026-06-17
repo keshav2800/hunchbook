@@ -38,7 +38,7 @@ export default function RootLayout({
             <TopNav />
             {/* Inner dashboard layer: one frosted panel floating on the
                 gradient world; all page cards live inside it. */}
-            <main className="mx-auto w-full max-w-[1440px] px-4 py-4 md:px-6">
+            <main className="mx-auto w-full max-w-[1440px] px-4 pt-4 pb-[calc(env(safe-area-inset-bottom)+5.5rem)] md:px-6 lg:pb-4">
               <div className="rounded-2xl bg-background/35 p-4 ring-1 ring-white/10 backdrop-blur-xl md:p-6">
                 {children}
               </div>
