@@ -2,8 +2,9 @@
 
 import { useState, type ReactNode } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { motion, AnimatePresence } from 'motion/react';
-import { ArrowRight, Bitcoin, ChevronLeft, Trophy, Waves } from 'lucide-react';
+import { ArrowRight, Bitcoin, ChevronLeft, Trophy } from 'lucide-react';
 import {
   Dialog,
   DialogClose,
@@ -381,9 +382,13 @@ export function HowItWorks({
               className="space-y-5"
             >
               <div className="flex flex-col items-center gap-3 text-center">
-                <span className={cn('flex size-11 items-center justify-center rounded-2xl text-white ring-4 ring-primary/15', GRADIENT)}>
-                  <Waves className="size-5" />
-                </span>
+                <Image
+                  src="/hunchbook.png"
+                  alt="Hunchbook"
+                  width={44}
+                  height={44}
+                  className="size-11 rounded-2xl ring-4 ring-primary/15"
+                />
                 <div className="space-y-1">
                   <p className="font-mono text-xs uppercase tracking-wider text-primary/80">Welcome to Hunchbook</p>
                   <h2 className="text-lg font-semibold tracking-tight">How do you want to use it?</h2>

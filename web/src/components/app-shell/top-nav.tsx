@@ -1,9 +1,10 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useState } from 'react';
 import { usePathname } from 'next/navigation';
-import { HelpCircle, Waves } from 'lucide-react';
+import { HelpCircle } from 'lucide-react';
 import { motion } from 'motion/react';
 import {
   Navbar,
@@ -31,8 +32,15 @@ const NAV_ITEMS = [
 function Brand() {
   return (
     <Link href="/" className="flex shrink-0 items-center gap-2">
-      <Waves className="size-6 text-primary" />
-      <span className="text-lg font-semibold tracking-tight">Hunchbook</span>
+      <Image
+        src="/hunchbook.png"
+        alt="Hunchbook"
+        width={40}
+        height={40}
+        priority
+        className="size-10"
+      />
+      <span className="text-lg font-semibold tracking-tight">HunchBook</span>
     </Link>
   );
 }

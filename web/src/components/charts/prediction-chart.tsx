@@ -7,6 +7,7 @@ import {
   BaselineSeries,
   ColorType,
   CrosshairMode,
+  type AutoscaleInfo,
   type IChartApi,
   type ISeriesApi,
   type MouseEventParams,
@@ -320,7 +321,7 @@ export function PredictionChart({
         lastValueVisible: true,
         // Keep BOTH bounds on the y-axis so the dashed lines (and the green/red
         // split) stay visible — widen the price scale to include them.
-        autoscaleInfoProvider: (orig) => {
+        autoscaleInfoProvider: (orig: () => AutoscaleInfo | null) => {
           const res = orig();
           if (!res) return res;
           const lo = Math.min(res.priceRange.minValue, lowerRef.current);

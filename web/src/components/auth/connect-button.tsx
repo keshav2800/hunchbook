@@ -20,7 +20,7 @@ export function ConnectButton() {
       as="button"
       type="button"
       variant="primary"
-      className="rounded-lg bg-[#4da2ff] text-white hover:bg-[#5fb0ff] hover:translate-y-0"
+      className="rounded-lg bg-gradient-to-b from-[#3b82f6] to-[#1d59e0] text-white shadow-[0px_1px_0px_0px_rgba(255,255,255,0.3)_inset] hover:translate-y-0 hover:brightness-110"
       disabled={!google || isPending}
       onClick={() =>
         google &&
