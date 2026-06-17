@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef } from 'react';
 import {
   createChart,
-  AreaSeries,
+  LineSeries,
   BaselineSeries,
   ColorType,
   CrosshairMode,
@@ -96,7 +96,6 @@ export function PredictionChart({
 
   // Overlay elements.
   const strikeElRef = useRef<HTMLDivElement>(null);
-  const bandElRef = useRef<HTMLDivElement>(null);
   const upperElRef = useRef<HTMLDivElement>(null);
   const lowerElRef = useRef<HTMLDivElement>(null);
 
@@ -134,26 +133,15 @@ export function PredictionChart({
       return y as number;
     };
     if (modeRef.current === 'single') {
-      if (bandElRef.current) bandElRef.current.style.display = 'none';
       if (upperElRef.current) upperElRef.current.style.display = 'none';
       if (lowerElRef.current) lowerElRef.current.style.display = 'none';
       place(strikeElRef.current, strikeRef.current);
     } else {
+      // The line is coloured green inside / red outside in applyData; here we
+      // just place the two dashed bound lines.
       if (strikeElRef.current) strikeElRef.current.style.display = 'none';
-      const yU = place(upperElRef.current, upperRef.current);
-      const yL = place(lowerElRef.current, lowerRef.current);
-      const band = bandElRef.current;
-      if (band && yU != null && yL != null) {
-        const last = dataRef.current.at(-1)?.value;
-        const inside = last != null && last >= lowerRef.current && last <= upperRef.current;
-        band.style.display = '';
-        band.style.top = `${yU}px`;
-        band.style.height = `${Math.max(0, yL - yU)}px`;
-        band.style.background = inside ? hexA(POSITIVE, 0.14) : hexA(PRIMARY, 0.1);
-        band.style.borderColor = inside ? hexA(POSITIVE, 0.5) : hexA(PRIMARY, 0.4);
-      } else if (band) {
-        band.style.display = 'none';
-      }
+      place(upperElRef.current, upperRef.current);
+      place(lowerElRef.current, lowerRef.current);
     }
   }, []);
 
@@ -177,10 +165,25 @@ export function PredictionChart({
     const s = seriesRef.current;
     const chart = chartRef.current;
     if (!s || !chart) return;
-    s.setData(dataRef.current);
+    if (modeRef.current === 'range') {
+      // Per-point colour: green while the price is inside the band, red outside.
+      const lo = lowerRef.current;
+      const hi = upperRef.current;
+      const colored = dataRef.current.map((p) => ({
+        ...p,
+        color: p.value >= lo && p.value <= hi ? POSITIVE : NEGATIVE,
+      }));
+      s.setData(colored as unknown as typeof dataRef.current);
+    } else {
+      s.setData(dataRef.current);
+    }
     chart.timeScale().fitContent();
     reposition();
   }, [reposition]);
+  // Stable handle so the drag/update effects can refit without taking applyData
+  // as a dependency (keeps their dep arrays a constant size).
+  const applyDataRef = useRef(applyData);
+  applyDataRef.current = applyData;
 
   // Create the chart once.
   useEffect(() => {
@@ -308,13 +311,23 @@ export function PredictionChart({
       });
       applySingleColors();
     } else {
-      seriesRef.current = chart.addSeries(AreaSeries, {
-        lineColor: PRIMARY,
-        topColor: hexA(PRIMARY, 0.4),
-        bottomColor: hexA(PRIMARY, 0.02),
+      // Range = one line coloured per-point in applyData: green inside the band,
+      // red outside it (the two-sided cousin of the Above/Below win/loss line).
+      seriesRef.current = chart.addSeries(LineSeries, {
+        color: PRIMARY,
         lineWidth: 2,
         priceLineVisible: false,
         lastValueVisible: true,
+        // Keep BOTH bounds on the y-axis so the dashed lines (and the green/red
+        // split) stay visible — widen the price scale to include them.
+        autoscaleInfoProvider: (orig) => {
+          const res = orig();
+          if (!res) return res;
+          const lo = Math.min(res.priceRange.minValue, lowerRef.current);
+          const hi = Math.max(res.priceRange.maxValue, upperRef.current);
+          const pad = (hi - lo) * 0.12 || 1;
+          return { priceRange: { minValue: lo - pad, maxValue: hi + pad }, margins: res.margins };
+        },
       }) as unknown as ISeriesApi<'Baseline'>;
     }
     applyData();
@@ -335,8 +348,15 @@ export function PredictionChart({
   // scale stays fixed to the data, so the reference line sits still.
   useEffect(() => {
     const s = seriesRef.current;
-    if (s && mode === 'single') s.applyOptions({ baseValue: { type: 'price', price: strike } });
-    reposition();
+    if (!s) return;
+    if (mode === 'single') {
+      s.applyOptions({ baseValue: { type: 'price', price: strike } });
+      reposition();
+    } else {
+      // Re-colour the line for the new band (green inside / red outside) and
+      // re-place the dashed bounds. Scale fits the price, so it stays steady.
+      applyDataRef.current();
+    }
   }, [strike, lower, upper, mode, reposition]);
 
   // Keep overlays glued on resize.
@@ -416,12 +436,8 @@ export function PredictionChart({
         </div>
       </div>
 
-      {/* Range band + two bound handles. */}
-      <div
-        ref={bandElRef}
-        className="pointer-events-none absolute inset-x-0 z-[9] border-y"
-        style={{ display: 'none' }}
-      />
+      {/* Range bound handles (dashed lines); the line itself is coloured
+          green inside / red outside in applyData. */}
       <div
         ref={upperElRef}
         className="pointer-events-none absolute inset-x-0 z-10 -translate-y-1/2"

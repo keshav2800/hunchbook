@@ -18,7 +18,7 @@ Core trading loop, account/stats, and the **full hedged PLP vault** (deposit/wit
 - [x] **Settlement mechanics** — answered: European-style, settles at **expiry only**. "Above $66,800" wins only if BTC is above $66,800 *at the settlement time*; intermediate moves don't count (not touch/American).
 - [x] **Is payout fixed at purchase?** — answered: **yes**. You lock in `units` (contracts) at the entry price; payout = `units × $1` fixed, odds locked at purchase. Win the fixed amount or lose stake (−1% fee).
 - [x] **Fix layout when an active bet exists** — chart now fills its card (flex-1 + h-full), so the columns stay flush instead of padding out a gap
-- [ ] **Decide what to do with the market cards row** at the bottom of the trade page
+- [x] **Markets board** (replaced the repetitive market-cards row) — expiry chips + 3 one-tap cards (Up/Down with gauge, Above strikes, Range bands) priced live off SVI; chart gained a 5m/15m/1h history selector (new `/api/prices`) so the x-axis isn't a flat ~3-min window, and Range now colours the line green-inside / red-outside like Above/Below
 - [ ] **Improve the Launch Token page** (`/launch`)
 - [x] **Add a "How it works"** explainer — guided wizard: intent chooser (Predict/Earn) with DeepBook-style framed generative art, then 3 illustrated BTC steps per path with confetti payoff; opens from a nav help icon (hover tooltip) + mobile menu item
 - [ ] **Improve leaderboard design**

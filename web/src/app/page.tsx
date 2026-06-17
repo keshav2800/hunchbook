@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useEffect, useState } from 'react';
+import { Suspense, useEffect, useRef, useState } from 'react';
 import { Bitcoin, TriangleAlert } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
@@ -12,11 +12,11 @@ import {
 } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
 import { PredictionChart } from '@/components/charts/prediction-chart';
-import { MarketCard } from '@/components/trade/market-card';
+import { MarketsBoard, type BoardPick } from '@/components/trade/markets-board';
 import { ExpiryTabs } from '@/components/trade/expiry-tabs';
 import { QuickBetPanel, RANGE_STEP, type Tab } from '@/components/trade/quick-bet-panel';
 import { ActiveBetsCard } from '@/components/trade/active-bets-card';
-import { useLiveMarkets } from '@/lib/hooks';
+import { useLiveMarkets, useOraclePrices } from '@/lib/hooks';
 import type { LiveMarket } from '@/lib/types';
 import { formatPct, formatUsd } from '@/lib/format';
 import { binaryUpProbability, probabilityToOdds, rangeProbability } from '@/lib/svi';
@@ -36,6 +36,34 @@ function AssetIcon({ symbol }: { symbol: string }) {
     <span className="flex size-5 items-center justify-center rounded-full bg-primary/20 text-[10px] font-bold text-primary">
       {symbol.slice(0, 1)}
     </span>
+  );
+}
+
+// How much price history the chart shows on the x-axis (independent of the bet's
+// expiry) — a short window looks flat because BTC barely moves in a minute.
+const CHART_RANGES = [
+  { m: 5, label: '5m' },
+  { m: 15, label: '15m' },
+  { m: 60, label: '1h' },
+] as const;
+
+function ChartRangeTabs({ value, onChange }: { value: number; onChange: (m: number) => void }) {
+  return (
+    <div className="flex items-center gap-0.5 rounded-lg border border-white/5 bg-[#17191e]/95 p-0.5">
+      {CHART_RANGES.map((r) => (
+        <button
+          key={r.m}
+          type="button"
+          onClick={() => onChange(r.m)}
+          className={cn(
+            'rounded-md px-2 py-1 font-mono text-[11px] uppercase tracking-wider transition-colors',
+            value === r.m ? 'bg-[#2b2e35] text-foreground' : 'text-muted-foreground hover:text-foreground',
+          )}
+        >
+          {r.label}
+        </button>
+      ))}
+    </div>
   );
 }
 
@@ -62,6 +90,7 @@ function TradePageInner() {
   const [tab, setTab] = useState<Tab>('ABOVE');
   const [strikeText, setStrikeText] = useState('');
   const [band, setBand] = useState({ low: 0, high: 0 });
+  const [chartMinutes, setChartMinutes] = useState(15);
 
   // User's explicit pick wins; otherwise the `?m=` deep link (from the global
   // search); otherwise the nearest market that isn't in its final pre-expiry
@@ -73,10 +102,20 @@ function TradePageInner() {
     markets.data?.find((m) => m.expiry - Date.now() > 30_000) ??
     markets.data?.[0];
 
+  // Longer price history for the chart's x-axis (the market's own sparkline is
+  // only ~3 min, which looks flat). Falls back to the sparkline until it loads.
+  const prices = useOraclePrices(market?.oracleId, chartMinutes);
+  const chartSpots = prices.data && prices.data.spots.length > 1 ? prices.data.spots : market?.sparkline ?? [];
+  const chartTimes = prices.data && prices.data.times.length > 1 ? prices.data.times : market?.sparkTimes ?? [];
+
   // Seed the strike at the current price; reseed when the market rolls over.
   const activeOracle = market?.oracleId;
+  // A board pick loads an explicit strike/band; skip the auto-reseed for that
+  // oracle so the defaults don't overwrite what the user just tapped.
+  const pickRef = useRef<string | null>(null);
   useEffect(() => {
     if (!market) return;
+    if (pickRef.current === market.oracleId) return;
     // Start the strike exactly on the current BTC price (snapped to the tick grid).
     setStrikeText(String(Math.round(market.spot / market.tickSize) * market.tickSize));
     setBand(defaultBand(market));
@@ -87,9 +126,24 @@ function TradePageInner() {
   // Range tab is entered (centered on the live price, scaled to volatility).
   useEffect(() => {
     if (tab !== 'RANGE' || !market) return;
+    if (pickRef.current === market.oracleId) return;
     setBand(defaultBand(market));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tab, activeOracle]);
+
+  // One-tap from the Markets board → load that exact bet into the chart + panel.
+  const handlePick = (p: BoardPick) => {
+    pickRef.current = p.oracleId;
+    setOracleId(p.oracleId);
+    setTab(p.tab);
+    if (p.tab === 'RANGE') setBand(p.band);
+    else setStrikeText(String(p.strike));
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    // Release after effects settle so future manual switches reseed normally.
+    setTimeout(() => {
+      pickRef.current = null;
+    }, 0);
+  };
 
   const allMarkets = markets.data ?? [];
   const assets = Array.from(new Set(allMarkets.map((m) => m.pair)));
@@ -151,25 +205,28 @@ function TradePageInner() {
 
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
         <Card>
-          <CardHeader className="flex-row items-center justify-between gap-4">
+          <CardHeader className="flex-row flex-wrap items-center justify-between gap-3">
             <ExpiryTabs markets={assetMarkets} value={market?.oracleId} onSelect={setOracleId} />
-            <div className="flex items-baseline gap-2">
-              <span className="font-mono text-2xl font-semibold tabular-nums">
-                {cents != null ? `${cents}¢` : '—'}
-              </span>
-              <span className="text-xs uppercase tracking-wider text-muted-foreground">
-                Contract
-              </span>
-              {mult > 0 ? (
-                <span className="text-sm font-medium text-positive">{mult.toFixed(2)}×</span>
-              ) : null}
+            <div className="flex items-center gap-3">
+              <ChartRangeTabs value={chartMinutes} onChange={setChartMinutes} />
+              <div className="flex items-baseline gap-2">
+                <span className="font-mono text-2xl font-semibold tabular-nums">
+                  {cents != null ? `${cents}¢` : '—'}
+                </span>
+                <span className="text-xs uppercase tracking-wider text-muted-foreground">
+                  Contract
+                </span>
+                {mult > 0 ? (
+                  <span className="text-sm font-medium text-positive">{mult.toFixed(2)}×</span>
+                ) : null}
+              </div>
             </div>
           </CardHeader>
           <CardContent className="flex-1 min-h-0">
             {market ? (
               <PredictionChart
-                spots={market.sparkline}
-                times={market.sparkTimes}
+                spots={chartSpots}
+                times={chartTimes}
                 mode={isRange ? 'range' : 'single'}
                 strike={strikeNum}
                 direction={direction}
@@ -202,18 +259,7 @@ function TradePageInner() {
         </div>
       </div>
 
-      <section className="space-y-3">
-        <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-          Live Prediction Markets — Sui Testnet
-        </h2>
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          {markets.data
-            ? markets.data.map((m) => (
-                <MarketCard key={m.oracleId} market={m} onSelect={setOracleId} />
-              ))
-            : Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-48 w-full" />)}
-        </div>
-      </section>
+      <MarketsBoard markets={assetMarkets} defaultOracleId={market?.oracleId} onPick={handlePick} />
     </div>
   );
 }
