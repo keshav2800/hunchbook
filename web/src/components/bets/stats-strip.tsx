@@ -4,8 +4,8 @@ import { StatCell } from '@/components/account/stat-cell';
 import { useBetHistory } from '@/lib/use-bet-history';
 import { formatNumber } from '@/lib/format';
 
-export function StatsStrip() {
-  const history = useBetHistory();
+export function StatsStrip({ address }: { address?: string } = {}) {
+  const history = useBetHistory(address);
   const s = history.data?.stats;
   return (
     <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">

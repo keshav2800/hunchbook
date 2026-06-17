@@ -5,19 +5,50 @@ export interface ProfileRow {
   username: string;
   email: string;
   bio: string;
+  views: number;
+  created_at: number; // unix ms
   updated_at: number; // unix ms
 }
 
-export async function getProfile(address: string): Promise<ProfileRow | null> {
-  const p = await prisma.profile.findUnique({ where: { address } });
-  if (!p) return null;
+function toRow(p: {
+  address: string;
+  username: string;
+  email: string;
+  bio: string;
+  views: number;
+  createdAt: Date;
+  updatedAt: Date;
+}): ProfileRow {
   return {
     address: p.address,
     username: p.username,
     email: p.email,
     bio: p.bio,
+    views: p.views,
+    created_at: p.createdAt.getTime(),
     updated_at: p.updatedAt.getTime(),
   };
+}
+
+export async function getProfile(address: string): Promise<ProfileRow | null> {
+  const p = await prisma.profile.findUnique({ where: { address } });
+  return p ? toRow(p) : null;
+}
+
+/**
+ * Public profile read that counts as a view: atomically bumps the counter and
+ * returns the fresh row. Returns null when the address has no profile yet.
+ */
+export async function recordProfileView(address: string): Promise<ProfileRow | null> {
+  try {
+    const p = await prisma.profile.update({
+      where: { address },
+      data: { views: { increment: 1 } },
+    });
+    return toRow(p);
+  } catch {
+    return null; // P2025: no such profile — nothing to view
+  }
 }
 
 /** Public usernames for a batch of addresses (missing entries omitted). */

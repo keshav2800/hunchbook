@@ -11,17 +11,19 @@ export interface BetHistoryResponse {
   truncated: boolean;
 }
 
-export function useBetHistory() {
+/** Bet history for `address`, or the signed-in account when omitted. */
+export function useBetHistory(address?: string) {
   const account = useCurrentAccount();
+  const owner = address ?? account?.address;
   return useQuery({
-    queryKey: ['bet-history', account?.address],
+    queryKey: ['bet-history', owner],
     queryFn: async (): Promise<BetHistoryResponse> => {
-      const res = await fetch(`/api/history?owner=${account!.address}`);
+      const res = await fetch(`/api/history?owner=${owner}`);
       const json = (await res.json()) as BetHistoryResponse & { error?: string };
       if (!res.ok) throw new Error(json.error ?? `GET /api/history → ${res.status}`);
       return json;
     },
-    enabled: !!account,
+    enabled: !!owner,
     staleTime: 30_000, // matches the server-side TTL; mutations invalidate explicitly
     retry: 1,
   });

@@ -27,6 +27,15 @@ export async function POST(req: Request) {
   }
   const row = await getProfile(address);
   return NextResponse.json(
-    row ? { address: row.address, username: row.username, email: row.email, bio: row.bio } : {},
+    row
+      ? {
+          address: row.address,
+          username: row.username,
+          email: row.email,
+          bio: row.bio,
+          views: row.views,
+          createdAt: row.created_at,
+        }
+      : {},
   );
 }

@@ -13,12 +13,15 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { BalanceReadout } from '@/components/account/balance-readout';
 import { StatsDialog } from '@/components/account/stats-dialog';
 import { shortAddress } from '@/lib/format';
+import { useAccountReadouts } from '@/lib/use-account-readouts';
 
 export function ProfileMenu() {
   const account = useCurrentAccount();
   const { mutate: disconnect } = useDisconnectWallet();
+  const { portfolio, cash } = useAccountReadouts();
   const [statsOpen, setStatsOpen] = useState(false);
   if (!account) return null;
 
@@ -39,6 +42,16 @@ export function ProfileMenu() {
           <DropdownMenuLabel className="font-mono text-xs">
             {shortAddress(account.address)}
           </DropdownMenuLabel>
+          {/* Portfolio/Cash live in the top nav on ≥sm; surface them here on mobile. */}
+          <div className="grid grid-cols-2 gap-1 p-1 sm:hidden">
+            <div className="flex items-center justify-center rounded-lg bg-[#2b2e35] py-1.5">
+              <BalanceReadout label="Portfolio" value={portfolio} />
+            </div>
+            <div className="flex items-center justify-center rounded-lg bg-[#2b2e35] py-1.5">
+              <BalanceReadout label="Cash" value={cash} />
+            </div>
+          </div>
+          <DropdownMenuSeparator className="sm:hidden" />
           <DropdownMenuItem
             onClick={() => {
               navigator.clipboard.writeText(account.address);

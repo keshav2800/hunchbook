@@ -23,6 +23,11 @@ export function shortAddress(addr: string): string {
   return `${addr.slice(0, 6)}…${addr.slice(-4)}`;
 }
 
+/** Canonical public-profile path for an address (shareable by address). */
+export function profilePath(addr: string): string {
+  return `/profile/${addr}`;
+}
+
 export function timeUntil(iso: string): string {
   const ms = new Date(iso).getTime() - Date.now();
   if (ms <= 0) return 'expired';

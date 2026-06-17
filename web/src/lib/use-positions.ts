@@ -16,27 +16,29 @@ async function getJson<T>(url: string): Promise<T> {
   return json;
 }
 
-export function useManagerId() {
+/** Account-manager id for `owner`, or the signed-in account when omitted. */
+export function useManagerId(owner?: string) {
   const account = useCurrentAccount();
+  const addr = owner ?? account?.address;
   return useQuery({
-    queryKey: ['manager-id', account?.address],
+    queryKey: ['manager-id', addr],
     queryFn: () =>
-      getJson<{ managerId: string | null }>(`/api/manager?owner=${account!.address}`).then(
-        (r) => r.managerId,
-      ),
-    enabled: !!account,
+      getJson<{ managerId: string | null }>(`/api/manager?owner=${addr}`).then((r) => r.managerId),
+    enabled: !!addr,
     staleTime: 60_000,
   });
 }
 
-export function usePositions() {
+/** Positions for `owner`, or the signed-in account when omitted. */
+export function usePositions(owner?: string) {
   const account = useCurrentAccount();
-  const managerId = useManagerId();
+  const addr = owner ?? account?.address;
+  const managerId = useManagerId(addr);
   return useQuery({
     queryKey: ['positions', managerId.data],
     queryFn: () =>
-      getJson<PositionsResponse>(`/api/positions?manager=${managerId.data}&owner=${account!.address}`),
-    enabled: !!managerId.data && !!account,
+      getJson<PositionsResponse>(`/api/positions?manager=${managerId.data}&owner=${addr}`),
+    enabled: !!managerId.data && !!addr,
     refetchInterval: 10_000,
   });
 }

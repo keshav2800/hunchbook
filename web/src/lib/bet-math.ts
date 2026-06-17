@@ -18,3 +18,17 @@ export function liveValue(
   const pUp = binaryUpProbability(market.forward, p.strikeUsd, market.svi);
   return (p.direction === 'UP' ? pUp : 1 - pUp) * p.units;
 }
+
+/**
+ * Market value of held bet positions (excludes the manager's free cash):
+ * live cash-out estimate for active bets, face value for claimable wins.
+ */
+export function positionsMarketValueUsd(
+  positions: BetPosition[],
+  markets?: LiveMarket[],
+): number {
+  return positions.reduce((acc, p) => {
+    if (p.status === 'active') return acc + (liveValue(p, markets) ?? 0);
+    return p.won ? acc + p.units : acc;
+  }, 0);
+}

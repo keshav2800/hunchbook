@@ -10,6 +10,8 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { AddressAvatar } from '@/components/account/address-avatar';
 import { ConnectButton } from '@/components/auth/connect-button';
 import { StatsStrip } from '@/components/bets/stats-strip';
+import { ProfileIdentityCard } from '@/components/profile/profile-identity-card';
+import { PnlCard } from '@/components/profile/pnl-card';
 import { shortAddress } from '@/lib/format';
 import { BIO_MAX, validateProfile } from '@/lib/profile-validation';
 import { useGoogleClaims, useMyProfile, useUpdateProfile } from '@/lib/use-profile';
@@ -24,6 +26,7 @@ export default function ProfilePage() {
   const [bio, setBio] = useState('');
   const [touched, setTouched] = useState(false);
   const [seeded, setSeeded] = useState(false);
+  const [editing, setEditing] = useState(false);
 
   // Email is not editable: it comes from the Google sign-in (stored copy
   // first, live Google claim as fallback for pre-fix profiles).
@@ -52,10 +55,24 @@ export default function ProfilePage() {
   const canSave = !update.isPending && username.length > 0 && !error;
 
   return (
-    <div className="mx-auto max-w-2xl space-y-6">
+    <div className="mx-auto max-w-4xl space-y-6">
+      <div className="grid gap-6 lg:grid-cols-2">
+        <ProfileIdentityCard
+          address={account.address}
+          owner
+          username={profile.data?.username}
+          views={profile.data?.views}
+          createdAt={profile.data?.createdAt}
+          metaPending={profile.isPending}
+          onEdit={() => setEditing(true)}
+        />
+        <PnlCard address={account.address} />
+      </div>
+
+      {editing ? (
       <Card>
         <CardHeader>
-          <CardTitle>Your Profile</CardTitle>
+          <CardTitle>Edit Profile</CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="flex items-center gap-4">
@@ -148,7 +165,12 @@ export default function ProfilePage() {
               <Button
                 className="w-full"
                 disabled={!canSave}
-                onClick={() => update.mutate({ username: username.trim(), email, bio: bio.trim() })}
+                onClick={() =>
+                  update.mutate(
+                    { username: username.trim(), email, bio: bio.trim() },
+                    { onSuccess: () => setEditing(false) },
+                  )
+                }
               >
                 {update.isPending ? 'Signing & saving…' : 'Save profile'}
               </Button>
@@ -159,6 +181,7 @@ export default function ProfilePage() {
           )}
         </CardContent>
       </Card>
+      ) : null}
 
       <div className="space-y-2">
         <p className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">

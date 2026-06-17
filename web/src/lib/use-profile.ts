@@ -9,12 +9,16 @@ import type { ProfileFields } from '@/lib/profile-validation';
 
 export interface OwnProfile extends ProfileFields {
   address: string;
+  views: number;
+  createdAt: number; // unix ms
 }
 
 export interface PublicProfile {
   address: string;
   username: string;
   bio: string;
+  views: number;
+  createdAt: number; // unix ms
 }
 
 async function jsonOrThrow<T>(res: Response): Promise<T> {
@@ -46,6 +50,22 @@ export function useMyProfile() {
     enabled: !!account,
     staleTime: Infinity, // refreshed explicitly on save
     retry: 1,
+  });
+}
+
+/**
+ * Public profile for any address (no email). The fetch counts as a profile
+ * view server-side, so the returned `views` is post-increment.
+ */
+export function usePublicProfile(address: string) {
+  return useQuery({
+    queryKey: ['public-profile', address],
+    queryFn: async (): Promise<Partial<PublicProfile>> => {
+      const res = await fetch(`/api/profile?address=${address}`);
+      return jsonOrThrow<Partial<PublicProfile>>(res);
+    },
+    enabled: address.startsWith('0x'),
+    staleTime: 60_000,
   });
 }
 

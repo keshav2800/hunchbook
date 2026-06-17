@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getProfile, upsertProfile } from '@/lib/server/profiles-db';
+import { getProfile, recordProfileView, upsertProfile } from '@/lib/server/profiles-db';
 
 import {
   profileWriteMessage,
@@ -10,15 +10,31 @@ import { validateProfile } from '@/lib/profile-validation';
 
 export const dynamic = 'force-dynamic';
 
-/** Public profile — never includes email. */
+/**
+ * Public profile — never includes email. A public read counts as a view, so we
+ * bump the counter and return the post-increment row.
+ */
 export async function GET(req: Request) {
-  const address = new URL(req.url).searchParams.get('address');
+  const url = new URL(req.url);
+  const address = url.searchParams.get('address');
   if (!address?.startsWith('0x')) {
     return NextResponse.json({ error: 'address query param required' }, { status: 400 });
   }
-  const row = await getProfile(address);
+  // `?count=0` lets the owner's own page read public fields without self-inflating views.
+  const row =
+    url.searchParams.get('count') === '0'
+      ? await getProfile(address)
+      : await recordProfileView(address);
   return NextResponse.json(
-    row ? { address: row.address, username: row.username, bio: row.bio } : {},
+    row
+      ? {
+          address: row.address,
+          username: row.username,
+          bio: row.bio,
+          views: row.views,
+          createdAt: row.created_at,
+        }
+      : {},
   );
 }
 
@@ -64,5 +80,7 @@ export async function PUT(req: Request) {
     username: row?.username ?? username,
     email: row?.email ?? email,
     bio: row?.bio ?? bio,
+    views: row?.views ?? 0,
+    createdAt: row?.created_at ?? Date.now(),
   });
 }
