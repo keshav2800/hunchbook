@@ -70,6 +70,7 @@ export function PredictionChart({
   label,
   onStrikeChange,
   onRangeChange,
+  showStrike = true,
   className,
 }: {
   spots: number[];
@@ -84,6 +85,8 @@ export function PredictionChart({
   label?: string;
   onStrikeChange?: (price: number) => void;
   onRangeChange?: (lower: number, upper: number) => void;
+  // Single-strike marker. Off for auto-bet, where the strike isn't user-chosen.
+  showStrike?: boolean;
   className?: string;
 }) {
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -110,6 +113,8 @@ export function PredictionChart({
   const labelRef = useRef(label);
   const onStrikeRef = useRef(onStrikeChange);
   const onRangeRef = useRef(onRangeChange);
+  const showStrikeRef = useRef(showStrike);
+  showStrikeRef.current = showStrike;
   labelRef.current = label;
   modeRef.current = mode;
   strikeRef.current = strike;
@@ -148,7 +153,8 @@ export function PredictionChart({
 
   const applySingleColors = useCallback(() => {
     const s = seriesRef.current;
-    if (!s || modeRef.current !== 'single') return;
+    // No strike reference (strike studio) → plain line, no win/loss split.
+    if (!s || modeRef.current !== 'single' || !showStrikeRef.current) return;
     const up = dirRef.current === 'UP';
     const topColor = up ? POSITIVE : NEGATIVE; // region above the strike
     const bottomColor = up ? NEGATIVE : POSITIVE; // region below the strike
@@ -303,7 +309,16 @@ export function PredictionChart({
       chart.removeSeries(seriesRef.current);
       seriesRef.current = null;
     }
-    if (mode === 'single') {
+    if (mode === 'single' && !showStrike) {
+      // Strike studio: the strike isn't a user-facing reference, so skip the
+      // green/red baseline split and draw one plain blue price line.
+      seriesRef.current = chart.addSeries(LineSeries, {
+        color: PRIMARY,
+        lineWidth: 2,
+        priceLineVisible: false,
+        lastValueVisible: true,
+      }) as unknown as ISeriesApi<'Baseline'>;
+    } else if (mode === 'single') {
       seriesRef.current = chart.addSeries(BaselineSeries, {
         baseValue: { type: 'price', price: strikeRef.current },
         lineWidth: 2,
@@ -332,7 +347,7 @@ export function PredictionChart({
       }) as unknown as ISeriesApi<'Baseline'>;
     }
     applyData();
-  }, [mode, applySingleColors, applyData]);
+  }, [mode, showStrike, applySingleColors, applyData]);
 
   // Feed real ticks.
   useEffect(() => {
@@ -351,7 +366,8 @@ export function PredictionChart({
     const s = seriesRef.current;
     if (!s) return;
     if (mode === 'single') {
-      s.applyOptions({ baseValue: { type: 'price', price: strike } });
+      // Plain line (no strike marker) has no baseline to move.
+      if (showStrikeRef.current) s.applyOptions({ baseValue: { type: 'price', price: strike } });
       reposition();
     } else {
       // Re-colour the line for the new band (green inside / red outside) and
@@ -405,9 +421,12 @@ export function PredictionChart({
     dragRef.current = which;
   };
 
-  const handlePill = (label: string, color: string) => (
+  const handlePill = (label: string, color: string, draggable: boolean) => (
     <div
-      className="pointer-events-auto absolute -top-3 right-16 flex h-6 cursor-grab touch-none items-center gap-1.5 rounded-md border bg-[#0d1523] px-2 font-mono text-xs font-semibold tabular-nums shadow-lg active:cursor-grabbing"
+      className={cn(
+        'pointer-events-auto absolute -top-3 right-16 flex h-6 touch-none items-center gap-1.5 rounded-md border bg-[#0d1523] px-2 font-mono text-xs font-semibold tabular-nums shadow-lg',
+        draggable ? 'cursor-grab active:cursor-grabbing' : 'cursor-default',
+      )}
       style={{ borderColor: hexA(color, 0.5), color }}
     >
       <span className="h-2.5 w-0.5 rounded-full" style={{ background: hexA(color, 0.7) }} />
@@ -427,15 +446,19 @@ export function PredictionChart({
       />
 
       {/* Single-strike handle (Above/Below). */}
-      <div
-        ref={strikeElRef}
-        className="pointer-events-none absolute inset-x-0 z-10 -translate-y-1/2"
-        style={{ display: 'none' }}
-      >
-        <div className="relative border-t border-dashed border-primary/70">
-          <div onPointerDown={grab('strike')}>{handlePill(formatUsd(strike, 0), PRIMARY)}</div>
+      {showStrike ? (
+        <div
+          ref={strikeElRef}
+          className="pointer-events-none absolute inset-x-0 z-10 -translate-y-1/2"
+          style={{ display: 'none' }}
+        >
+          <div className="relative border-t border-dashed border-primary/70">
+            <div onPointerDown={onStrikeChange ? grab('strike') : undefined}>
+              {handlePill(formatUsd(strike, 0), PRIMARY, !!onStrikeChange)}
+            </div>
+          </div>
         </div>
-      </div>
+      ) : null}
 
       {/* Range bound handles (dashed lines); the line itself is coloured
           green inside / red outside in applyData. */}
@@ -445,7 +468,9 @@ export function PredictionChart({
         style={{ display: 'none' }}
       >
         <div className="relative border-t border-dashed border-primary/70">
-          <div onPointerDown={grab('upper')}>{handlePill(formatUsd(upper, 0), PRIMARY)}</div>
+          <div onPointerDown={onRangeChange ? grab('upper') : undefined}>
+            {handlePill(formatUsd(upper, 0), PRIMARY, !!onRangeChange)}
+          </div>
         </div>
       </div>
       <div
@@ -454,7 +479,9 @@ export function PredictionChart({
         style={{ display: 'none' }}
       >
         <div className="relative border-t border-dashed border-primary/70">
-          <div onPointerDown={grab('lower')}>{handlePill(formatUsd(lower, 0), PRIMARY)}</div>
+          <div onPointerDown={onRangeChange ? grab('lower') : undefined}>
+            {handlePill(formatUsd(lower, 0), PRIMARY, !!onRangeChange)}
+          </div>
         </div>
       </div>
     </div>

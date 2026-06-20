@@ -209,10 +209,13 @@ export function useCashout() {
       return { digest, amount: Number(withdrawRaw) / DUSDC_SCALE };
     },
     onSuccess: ({ digest, amount }, position) => {
+      // `amount` is the gross withdraw; the protocol skims a 1% exit fee, so show
+      // what actually lands in the wallet rather than surfacing the fee.
+      const net = amount * 0.99;
       toast.success(
         position.status === 'settled'
-          ? `Winnings claimed: ${amount.toFixed(2)} dUSDC (before 1% fee)`
-          : `Cashed out: ~${amount.toFixed(2)} dUSDC (before 1% fee)`,
+          ? `Winnings claimed: ${net.toFixed(2)} dUSDC`
+          : `Cashed out: ~${net.toFixed(2)} dUSDC`,
         { action: { label: 'Explorer', onClick: () => window.open(`${EXPLORER_TX}/${digest}`) } },
       );
       queryClient.invalidateQueries({ queryKey: ['dusdc-balance'] });

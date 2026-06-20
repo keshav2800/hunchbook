@@ -32,7 +32,6 @@ const NAV_ITEMS = [
   { name: 'Strike', link: '/strike' },
   { name: 'Vault', link: '/vault' },
   { name: 'Leaderboard', link: '/leaderboard' },
-  { name: 'Launch', link: '/launch', badge: 'Soon' },
 ];
 
 // Primary destinations as a floating glass dock on small screens.
@@ -84,11 +83,6 @@ function NavTabs({ pathname }: { pathname: string }) {
               />
             )}
             <span className="relative z-10">{item.name}</span>
-            {item.badge ? (
-              <span className="relative z-10 rounded-full bg-accent px-1.5 text-[10px] font-semibold tracking-wider text-accent-foreground">
-                {item.badge}
-              </span>
-            ) : null}
           </Link>
         );
       })}

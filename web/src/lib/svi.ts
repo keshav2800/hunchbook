@@ -88,3 +88,26 @@ export function probabilityToOdds(p: number): number {
   if (p <= 0.001) return 0;
   return (1 / p) * (1 - FEE);
 }
+
+export function strikeForWinProbability(
+  forward: number,
+  direction: 'UP' | 'DOWN',
+  targetWinProb: number,
+  svi: SviParams,
+  tickSize: number,
+  minStrike: number,
+): number {
+  // P(win | UP) = P(settle > K); P(win | DOWN) = 1 − P(settle > K).
+  const pUpTarget = direction === 'UP' ? targetWinProb : 1 - targetWinProb;
+  let lo = forward * 0.5; // prob ≈ 1 (deep in the money)
+  let hi = forward * 1.5; // prob ≈ 0 (far out of the money)
+  for (let i = 0; i < 40; i++) {
+    const mid = (lo + hi) / 2;
+    // prob too high → strike too low → search the upper half.
+    if (binaryUpProbability(forward, mid, svi) > pUpTarget) lo = mid;
+    else hi = mid;
+  }
+  const tick = tickSize || 1;
+  const snapped = Math.round((lo + hi) / 2 / tick) * tick;
+  return Math.max(snapped, minStrike);
+}

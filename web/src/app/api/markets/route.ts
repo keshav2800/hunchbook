@@ -55,8 +55,9 @@ export async function GET() {
   }
   try {
     const oracles = await listOracles();
+    const now = Date.now();
     const active = oracles
-      .filter((o) => o.status === 'active')
+      .filter((o) => o.status === 'active' && o.expiry > now)
       .sort((a, b) => a.expiry - b.expiry);
     const markets = (
       await Promise.all(
@@ -69,10 +70,6 @@ export async function GET() {
         }),
       )
     ).filter((m): m is LiveMarket => m !== null);
-    // Mid-rollover (or on indexer lag) the active list can be transiently
-    // empty. Serving — and worse, caching — that empty snapshot blanks every
-    // panel on the trade page for seconds. Serve the last good list instead
-    // and keep it cached until real markets come back.
     if (markets.length === 0 && cache && cache.data.length > 0) {
       cache = { data: cache.data, at: Date.now() };
       return NextResponse.json(cache.data);

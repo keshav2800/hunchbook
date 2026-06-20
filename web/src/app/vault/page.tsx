@@ -14,6 +14,8 @@ import {
 import { StatCard } from '@/components/stat-card';
 import { NavChart } from '@/components/vault/nav-chart';
 import { DepositWithdraw } from '@/components/vault/deposit-withdraw';
+import { YieldFlywheel } from '@/components/vault/yield-flywheel';
+import { LeverageProjection } from '@/components/vault/leverage-projection';
 import { EXPLORER_TX } from '@/lib/bet-math';
 import { formatCompactUsd, formatNumber, formatPct, formatUsd, shortAddress } from '@/lib/format';
 import { useVaultStats } from '@/lib/use-vault';
@@ -92,18 +94,19 @@ export default function VaultPage() {
         />
       </div>
 
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
-        <Card>
-          <CardHeader>
-            <CardTitle>NAV & Drawdown — on-chain history</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <NavChart history={s.history} />
-          </CardContent>
-        </Card>
+      <YieldFlywheel />
 
+      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px] xl:items-start">
         <div className="space-y-6">
-          <DepositWithdraw />
+          <Card>
+            <CardHeader>
+              <CardTitle>NAV & Drawdown — on-chain history</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <NavChart history={s.history} />
+            </CardContent>
+          </Card>
+
           <Card>
             <CardHeader>
               <CardTitle>Vault Composition</CardTitle>
@@ -128,6 +131,11 @@ export default function VaultPage() {
               ))}
             </CardContent>
           </Card>
+        </div>
+
+        <div className="space-y-6">
+          <DepositWithdraw />
+          <LeverageProjection apyPct={s.apyPct} />
         </div>
       </div>
 
