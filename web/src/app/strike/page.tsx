@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useCurrentAccount } from '@mysten/dapp-kit';
+import { toast } from 'sonner';
 import { motion, AnimatePresence, useMotionValueEvent, useSpring } from 'motion/react';
 import { ArrowDown, ArrowUp, Flame, Square, Timer } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -389,18 +390,21 @@ export default function StrikeStudioPage() {
                   <Button
                     size="lg"
                     className="w-full gap-2 bg-foreground font-semibold uppercase tracking-wider text-background hover:bg-foreground/90"
-                    onClick={stop}
+                    onClick={() => {
+                      stop();
+                      toast('Auto-bet stopped', { description: 'Set up a new run below.' });
+                    }}
                   >
-                    <Square className="size-4 fill-current" /> Stop now
+                    <Square className="size-4 fill-current" /> Stop &amp; reconfigure
                   </Button>
                 ) : (
                   <Button size="lg" variant="outline" className="w-full" onClick={reset}>
-                    Run again
+                    New auto-bet
                   </Button>
                 )}
                 {running ? (
                   <p className="text-center text-[11px] leading-relaxed text-muted-foreground">
-                    Keeps running if you refresh or come back later. Only Stop ends it; a bet already placed still settles.
+                    Keeps running if you refresh or come back later. Stop ends it and returns to setup; a bet already placed still settles.
                   </p>
                 ) : null}
               </>

@@ -63,6 +63,7 @@ interface AddrStats {
   wins: number;
   losses: number;
   wageredUsd: number;
+  pnlUsd: number; // realized net P/L
 }
 
 const marketKey = (sender: string, r: { oracleId: string; expiry: number; strikeUsd: number; direction: string }) =>
@@ -80,6 +81,7 @@ function rank(stats: AddrStats[]): LeaderboardEntry[] {
         address: s.address,
         winRatePct: settled > 0 ? (s.wins / settled) * 100 : 0,
         wageredUsd: s.wageredUsd,
+        pnlUsd: s.pnlUsd,
         totalBets: s.totalBets,
         wins: s.wins,
         losses: s.losses,
@@ -103,11 +105,12 @@ export async function GET() {
     const oracles = new Map(oracleList.map((o) => [o.oracle_id, o]));
 
     // Early cash-outs (pre-expiry) remove a bet from the win/loss record —
-    // same semantics as /api/history, keyed per sender + market.
-    const earlyCashouts = new Set<string>();
+    // same semantics as /api/history, keyed per sender + market. Keep the
+    // received amount so P/L can realize (received − stake) on the early exit.
+    const earlyCashouts = new Map<string, number>();
     for (const c of cashoutScan.cashouts) {
       const sender = cashoutScan.bySender.get(c.digest)?.[0];
-      if (sender && c.timestampMs < c.expiry) earlyCashouts.add(marketKey(sender, c));
+      if (sender && c.timestampMs < c.expiry) earlyCashouts.set(marketKey(sender, c), c.receivedUsd);
     }
 
     const build = (sinceMs: number): LeaderboardEntry[] => {
@@ -118,19 +121,30 @@ export async function GET() {
         if (!sender) continue;
         let s = byAddr.get(sender);
         if (!s) {
-          s = { address: sender, totalBets: 0, wins: 0, losses: 0, wageredUsd: 0 };
+          s = { address: sender, totalBets: 0, wins: 0, losses: 0, wageredUsd: 0, pnlUsd: 0 };
           byAddr.set(sender, s);
         }
         s.totalBets += 1;
         s.wageredUsd += bet.stakeUsd;
-        if (earlyCashouts.has(marketKey(sender, bet))) continue; // neither win nor loss
+        const key = marketKey(sender, bet);
+        const earlyReceived = earlyCashouts.get(key);
+        if (earlyReceived !== undefined) {
+          // Cashed out early: neither win nor loss, but realizes received − stake.
+          s.pnlUsd += earlyReceived - bet.stakeUsd;
+          continue;
+        }
         const oracle = oracles.get(bet.oracleId);
-        if (oracle?.status !== 'settled' || oracle.settlement_price === null) continue;
+        if (oracle?.status !== 'settled' || oracle.settlement_price === null) continue; // open → unrealized
         const settlementUsd = decodeScaled(Number(oracle.settlement_price));
         const won =
           bet.direction === 'UP' ? settlementUsd > bet.strikeUsd : settlementUsd < bet.strikeUsd;
-        if (won) s.wins += 1;
-        else s.losses += 1;
+        if (won) {
+          s.wins += 1;
+          s.pnlUsd += bet.units - bet.stakeUsd; // won binary pays `units` × $1
+        } else {
+          s.losses += 1;
+          s.pnlUsd -= bet.stakeUsd;
+        }
       }
       return rank([...byAddr.values()]);
     };

@@ -82,7 +82,8 @@ export interface LeaderboardEntry {
   rank: number;
   address: string;
   winRatePct: number; // settled bets only; 0 when nothing settled
-  wageredUsd: number; // ranking key
+  wageredUsd: number; // volume (ranking key)
+  pnlUsd: number; // realized net P/L in dUSDC (positive = profit)
   totalBets: number;
   wins: number;
   losses: number;

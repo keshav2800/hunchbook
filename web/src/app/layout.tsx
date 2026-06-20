@@ -16,10 +16,34 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const SITE_TITLE = "Hunchbook";
+const SITE_DESC = "Prediction markets and liquidity vault on Sui / DeepBook";
+
 export const metadata: Metadata = {
   metadataBase: new URL("https://hunchbook.tech"),
-  title: "Hunchbook",
-  description: "Prediction markets and liquidity vault on Sui / DeepBook",
+  title: SITE_TITLE,
+  description: SITE_DESC,
+  openGraph: {
+    type: "website",
+    url: "https://hunchbook.tech",
+    siteName: SITE_TITLE,
+    title: SITE_TITLE,
+    description: SITE_DESC,
+    images: [
+      {
+        url: "/dashboard.png", // served from public/, resolved against metadataBase
+        width: 2880,
+        height: 1800,
+        alt: "Hunchbook dashboard",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: SITE_TITLE,
+    description: SITE_DESC,
+    images: ["/dashboard.png"],
+  },
 };
 
 export default function RootLayout({

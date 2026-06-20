@@ -184,11 +184,13 @@ export function useAutoBet() {
   // (tear down). Without this, a route change would clear the saved session.
   const pausedRef = useRef(false);
 
+  // Explicit stop tears the session down and returns to the config form so the
+  // bettor can set up a fresh run. (Natural completion shows a recap instead.)
   const stop = useCallback(() => {
     pausedRef.current = false;
     runningRef.current = false;
     clearSession();
-    setState((s) => ({ ...s, status: 'done', endedReason: 'Stopped' }));
+    setState(IDLE);
   }, []);
 
   // Component unmount (route change / refresh) pauses the in-memory loop, but
