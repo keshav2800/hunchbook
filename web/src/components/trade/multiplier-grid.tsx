@@ -253,11 +253,16 @@ export function MultiplierGrid({
                   vectorEffect="non-scaling-stroke"
                 />
               </svg>
-              {/* live dot at the line's leading edge, meeting the spot pill */}
               <span
-                className="absolute size-2.5 -translate-y-1/2 rounded-full bg-primary"
-                style={{ top: `${(linePts.lastFrac * 100).toFixed(2)}%`, right: -2, boxShadow: `0 0 0 4px rgba(${PRIMARY_RGB}, 0.18)` }}
-              />
+                className="absolute size-2.5 -translate-y-1/2"
+                style={{ top: `${(linePts.lastFrac * 100).toFixed(2)}%`, right: -2 }}
+              >
+                <span className="absolute inset-0 animate-ping rounded-full bg-primary opacity-75" />
+                <span
+                  className="absolute inset-0 rounded-full bg-primary"
+                  style={{ boxShadow: `0 0 0 4px rgba(${PRIMARY_RGB}, 0.18)` }}
+                />
+              </span>
             </>
           ) : null}
         </div>
