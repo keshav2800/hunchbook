@@ -14,10 +14,12 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { PredictionChart } from '@/components/charts/prediction-chart';
 import { MarketsBoard, type BoardPick } from '@/components/trade/markets-board';
 import { ExpiryTabs } from '@/components/trade/expiry-tabs';
+import { MultiplierGrid } from '@/components/trade/multiplier-grid';
 import { QuickBetPanel, RANGE_STEP, type Tab } from '@/components/trade/quick-bet-panel';
 import { ActiveBetsCard } from '@/components/trade/active-bets-card';
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
 import { useLiveMarkets, useOraclePrices } from '@/lib/hooks';
+import { usePositions } from '@/lib/use-positions';
 import type { LiveMarket } from '@/lib/types';
 import { formatPct, formatUsd } from '@/lib/format';
 import { binaryUpProbability, probabilityToOdds, rangeProbability } from '@/lib/svi';
@@ -84,6 +86,30 @@ function ChartRangeTabs({ value, onChange }: { value: number; onChange: (m: numb
   );
 }
 
+type View = 'chart' | 'grid';
+
+/** Chart ⇄ Grid toggle — same skin as the range tabs. Grid is the tappable
+ *  multiplier view over the same markets; Chart is the drag-the-strike view. */
+function ViewTabs({ value, onChange }: { value: View; onChange: (v: View) => void }) {
+  return (
+    <div className="flex items-center gap-0.5 rounded-lg border border-white/5 bg-[#17191e]/95 p-0.5">
+      {(['chart', 'grid'] as const).map((v) => (
+        <button
+          key={v}
+          type="button"
+          onClick={() => onChange(v)}
+          className={cn(
+            'rounded-md px-2 py-1 font-mono text-[11px] uppercase tracking-wider transition-colors',
+            value === v ? 'bg-[#2b2e35] text-foreground' : 'text-muted-foreground hover:text-foreground',
+          )}
+        >
+          {v}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 /** A sensible Range band: centered on spot, width scaled to recent volatility,
  *  snapped to the ladder grid so the bound handles land on rows. */
 function defaultBand(market: LiveMarket): { low: number; high: number } {
@@ -108,6 +134,8 @@ function TradePageInner() {
   const [strikeText, setStrikeText] = useState('');
   const [band, setBand] = useState({ low: 0, high: 0 });
   const [chartMinutes, setChartMinutes] = useState(15);
+  // Chart (drag-the-strike) vs Grid (tap-a-multiplier) view of the same markets.
+  const [view, setView] = useState<View>('chart');
   // Mobile bottom-sheet (bet panel) open state.
   const [betOpen, setBetOpen] = useState(false);
   const isDesktop = useIsDesktop();
@@ -168,9 +196,26 @@ function TradePageInner() {
     }, 0);
   };
 
+  // A grid cell carries an explicit expiry (column) + strike (row) + direction
+  // → load it into the shared bet state, same flow as a board pick.
+  const handleGridPick = (gridOracleId: string, gridStrike: number, gridTab: Tab) => {
+    pickRef.current = gridOracleId;
+    setOracleId(gridOracleId);
+    setTab(gridTab);
+    setStrikeText(String(gridStrike));
+    if (!isDesktop) setBetOpen(true);
+    setTimeout(() => {
+      pickRef.current = null;
+    }, 0);
+  };
+
   const allMarkets = markets.data ?? [];
   const assets = Array.from(new Set(allMarkets.map((m) => m.pair)));
   const assetMarkets = allMarkets.filter((m) => m.pair === market?.pair);
+
+  // Active bets, so the grid can mark the strike/expiry the user is sitting on.
+  const positions = usePositions();
+  const activeBets = (positions.data?.positions ?? []).filter((p) => p.status === 'active');
   const pickAsset = (pair: string) => {
     const first = allMarkets.find((m) => m.pair === pair);
     if (first) setOracleId(first.oracleId);
@@ -228,15 +273,16 @@ function TradePageInner() {
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
         <Card>
-          <CardHeader className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+          <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             {/* ExpiryTabs owns its own horizontal scroll (pills scroll, "More"
                 stays pinned), so this just lets the flex item shrink. */}
             <div className="min-w-0">
               <ExpiryTabs markets={assetMarkets} value={market?.oracleId} onSelect={setOracleId} />
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex shrink-0 items-center gap-3">
+              <ViewTabs value={view} onChange={setView} />
               <ChartRangeTabs value={chartMinutes} onChange={setChartMinutes} />
-              <div className="flex items-baseline gap-2">
+              <div className="flex shrink-0 items-baseline gap-2 whitespace-nowrap">
                 <span className="font-mono text-2xl font-semibold tabular-nums">
                   {cents != null ? `${cents}¢` : '—'}
                 </span>
@@ -250,7 +296,21 @@ function TradePageInner() {
             </div>
           </CardHeader>
           <CardContent className="flex-1 min-h-0">
-            {market ? (
+            {!market ? (
+              <Skeleton className="h-full min-h-[420px] w-full" />
+            ) : view === 'grid' ? (
+              <MultiplierGrid
+                markets={assetMarkets}
+                spot={market.spot}
+                chartSpots={chartSpots}
+                bets={activeBets}
+                selectedOracleId={market.oracleId}
+                selectedStrike={strikeNum}
+                onPick={handleGridPick}
+                maxCols={isDesktop ? 8 : 4}
+                className="min-h-[420px]"
+              />
+            ) : (
               <PredictionChart
                 spots={chartSpots}
                 times={chartTimes}
@@ -266,8 +326,6 @@ function TradePageInner() {
                 onRangeChange={(low, high) => setBand({ low, high })}
                 className="h-full min-h-[420px]"
               />
-            ) : (
-              <Skeleton className="h-full min-h-[420px] w-full" />
             )}
           </CardContent>
         </Card>
