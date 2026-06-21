@@ -53,6 +53,68 @@ function StatRow({ label, value }: { label: string; value: string }) {
   );
 }
 
+/** Sui-style frequency bars: a bright, rounded equaliser that fades in from the
+ *  left. The winner's backdrop. Heights are fixed so SSR and client agree. */
+function BarsPattern() {
+  const heights = [58, 84, 50, 96, 70, 90, 46, 78, 64, 92, 54, 100, 68, 82, 60, 88];
+  return (
+    <div
+      aria-hidden
+      className="pointer-events-none absolute inset-0 flex items-end gap-[3px] opacity-40 [mask-image:linear-gradient(to_right,transparent,#000_88%)]"
+    >
+      {heights.map((h, i) => (
+        <div
+          key={i}
+          className="flex-1 rounded-full"
+          style={{ height: `${h}%`, background: 'linear-gradient(to top, transparent, rgba(77, 162, 255, 0.7))' }}
+        />
+      ))}
+    </div>
+  );
+}
+
+/** Flowing tick-marks: the calmer Sui motif, behind the 2nd/3rd cards. */
+function DashesPattern() {
+  const cols = 16;
+  const rows = 10;
+  const L = 3.2;
+  const dashes: { x: number; y: number; a: number }[] = [];
+  for (let c = 0; c < cols; c++) {
+    for (let r = 0; r < rows; r++) {
+      const x = (c + 0.5) * (120 / cols);
+      const y = (r + 0.5) * (80 / rows);
+      const a = Math.sin(c * 0.5 + r * 0.18) * 0.5; // gentle tilt wave
+      dashes.push({ x, y, a });
+    }
+  }
+  return (
+    <svg
+      aria-hidden
+      viewBox="0 0 120 80"
+      preserveAspectRatio="xMidYMid slice"
+      className="pointer-events-none absolute inset-0 size-full opacity-50"
+    >
+      {dashes.map((d, i) => {
+        const dx = Math.sin(d.a) * L;
+        const dy = Math.cos(d.a) * L;
+        return (
+          <line
+            key={i}
+            x1={(d.x - dx).toFixed(2)}
+            y1={(d.y - dy).toFixed(2)}
+            x2={(d.x + dx).toFixed(2)}
+            y2={(d.y + dy).toFixed(2)}
+            stroke="rgba(255, 255, 255, 0.16)"
+            strokeWidth={0.7}
+            strokeLinecap="round"
+            vectorEffect="non-scaling-stroke"
+          />
+        );
+      })}
+    </svg>
+  );
+}
+
 function PodiumCard({ spot, you, metric }: { spot: Spot; you: boolean; metric: LeaderMetric }) {
   const m = META[spot.rank];
   const e = spot.entry;
@@ -84,6 +146,9 @@ function PodiumCard({ spot, you, metric }: { spot: Spot; you: boolean; metric: L
           isWinner ? 'border-primary/40' : 'border-white/10',
         )}
       >
+        {/* Sui motif backdrop: equaliser bars for the winner, dashes for the rest. */}
+        {isWinner ? <BarsPattern /> : <DashesPattern />}
+
         {/* faint blue wash for the winner — accent, not surface */}
         {isWinner ? (
           <motion.div
