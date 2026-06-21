@@ -31,9 +31,9 @@ export const metadata: Metadata = {
     description: SITE_DESC,
     images: [
       {
-        url: "/dashboard.png", // served from public/, resolved against metadataBase
-        width: 2880,
-        height: 1800,
+        url: "/og.png", // 1200x630 (1.91:1) — served from public/, resolved against metadataBase
+        width: 1200,
+        height: 630,
         alt: "Hunchbook dashboard",
       },
     ],
@@ -42,7 +42,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: SITE_TITLE,
     description: SITE_DESC,
-    images: ["/dashboard.png"],
+    images: ["/og.png"],
   },
 };
 
