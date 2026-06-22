@@ -394,6 +394,22 @@ export function useAutoBet() {
     [account, run],
   );
 
+  // When the signed-in account changes (signout, or switch to a different
+  // address) the in-memory run belongs to the *old* account — abandon it so the
+  // UI doesn't show someone else's session as still running. The old account's
+  // persisted session is left intact (pausedRef) so it can resume on re-login,
+  // and resume is re-armed so the new account can pick up its own saved session.
+  const prevAddrRef = useRef<string | undefined>(account?.address);
+  useEffect(() => {
+    const addr = account?.address;
+    if (prevAddrRef.current === addr) return;
+    prevAddrRef.current = addr;
+    runningRef.current = false;
+    pausedRef.current = true; // keep the old account's saved session for resume
+    resumedRef.current = false; // let the new account resume its own session
+    setState(IDLE);
+  }, [account?.address]);
+
   // On mount (and once the account is known), resume a session left running by
   // a previous page load. Guarded so it only fires once.
   useEffect(() => {

@@ -227,13 +227,12 @@ export default function StrikeStudioPage() {
                   <div className="flex gap-1">
                     {dots.map((_, i) => {
                       const r = state.log.find((l) => l.round === i + 1);
-                      const isNext = !r && i + 1 === state.round + 1 && running;
-                      const live = r?.status === 'pending' || isNext;
+                      const live = r?.status === 'pending';
                       return (
                         <div key={i} className="relative h-2 flex-1 overflow-hidden rounded-full bg-white/10">
                           <motion.div
                             initial={false}
-                            animate={{ width: r || isNext ? '100%' : '0%' }}
+                            animate={{ width: r ? '100%' : '0%' }}
                             transition={{ duration: 0.4, ease: 'easeOut' }}
                             className={cn(
                               'absolute inset-y-0 left-0 rounded-full',
