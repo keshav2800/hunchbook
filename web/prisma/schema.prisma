@@ -1,6 +1,7 @@
 // Hunchbook off-chain data (Postgres / Neon).
-// Bets, wins, and the leaderboard remain ON-CHAIN (indexer + tx scan) — Postgres
-// holds identity + future social/launchpad data the chain can't serve well.
+// Identity in `profiles`. The leaderboard tables (`bet_txs`, `cashout_txs`,
+// `leaderboard_sync`) are a cache of router txs scanned by /api/leaderboard/sync,
+// so the leaderboard can aggregate over full history without re-scanning chain.
 // Use Neon's POOLED connection string in DATABASE_URL for serverless (…-pooler.…).
 
 generator client {
@@ -24,4 +25,54 @@ model Profile {
   updatedAt DateTime @updatedAt
 
   @@map("profiles")
+}
+
+/// One row per router::place_bet success tx. Populated by /api/leaderboard/sync
+/// walking the chain newest-first; `digest` is the on-chain idempotency key.
+model BetTx {
+  digest      String   @id
+  sender      String
+  oracleId    String
+  expiry      BigInt
+  strikeUsd   Float
+  direction   String   // 'UP' | 'DOWN'
+  stakeUsd    Float
+  units       Float
+  timestampMs BigInt
+  createdAt   DateTime @default(now())
+
+  @@index([sender])
+  @@index([timestampMs])
+  @@map("bet_txs")
+}
+
+/// One row per router::cashout success tx. Mirrors BetTx — joined to bets in
+/// the leaderboard aggregator by (sender, oracleId, expiry, strike, direction).
+model CashoutTx {
+  digest      String   @id
+  sender      String
+  oracleId    String
+  expiry      BigInt
+  strikeUsd   Float
+  direction   String
+  receivedUsd Float
+  timestampMs BigInt
+  createdAt   DateTime @default(now())
+
+  @@index([sender])
+  @@index([timestampMs])
+  @@map("cashout_txs")
+}
+
+/// Singleton (id='leaderboard') tracking the newest tx digest the sync job has
+/// already absorbed per router function — lets each sync resume incrementally
+/// instead of re-scanning the whole chain.
+model LeaderboardSync {
+  id              String   @id
+  lastBetDigest   String?
+  lastCashoutDigest String?
+  lastRunAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("leaderboard_sync")
 }

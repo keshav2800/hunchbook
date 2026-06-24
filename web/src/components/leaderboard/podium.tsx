@@ -12,10 +12,11 @@ type Spot = { rank: Rank; entry?: LeaderboardEntry; name?: string };
 
 const RANK_LABEL: Record<Rank, string> = { 1: '1st', 2: '2nd', 3: '3rd' };
 // Winner is tallest/centered; blue is its accent. Others recede in dark.
+// Heights step up at sm: phones use a tighter stack so all three cards fit.
 const META: Record<Rank, { minH: string; delay: number }> = {
-  1: { minH: 'min-h-[16rem]', delay: 0.12 },
-  2: { minH: 'min-h-[13.25rem]', delay: 0.04 },
-  3: { minH: 'min-h-[12.5rem]', delay: 0.08 },
+  1: { minH: 'min-h-[12.5rem] sm:min-h-[16rem]', delay: 0.12 },
+  2: { minH: 'min-h-[10.5rem] sm:min-h-[13.25rem]', delay: 0.04 },
+  3: { minH: 'min-h-[10rem] sm:min-h-[12.5rem]', delay: 0.08 },
 };
 
 /** Big headline value for the active sort (signed + tinted for P/L). */
@@ -122,7 +123,7 @@ function PodiumCard({ spot, you, metric }: { spot: Spot; you: boolean; metric: L
 
   if (!e) {
     return (
-      <div className={cn('flex flex-col rounded-xl border border-dashed border-white/10 bg-[#0d0f14]/60 p-4', m.minH)}>
+      <div className={cn('flex flex-col rounded-xl border border-dashed border-white/10 bg-[#0d0f14]/60 p-3 sm:p-4', m.minH)}>
         <RankChip rank={spot.rank} winner={false} />
         <p className="m-auto text-xs text-muted-foreground">Open spot</p>
       </div>
@@ -141,7 +142,7 @@ function PodiumCard({ spot, you, metric }: { spot: Spot; you: boolean; metric: L
         transition={{ type: 'spring', stiffness: 130, damping: 17, delay: m.delay }}
         style={isWinner ? { boxShadow: '0 0 48px -16px rgba(77,162,255,0.55)' } : undefined}
         className={cn(
-          'relative flex flex-col overflow-hidden rounded-xl border bg-[#0d0f14] p-4 transition-transform duration-200 group-hover:-translate-y-1',
+          'relative flex flex-col overflow-hidden rounded-xl border bg-[#0d0f14] p-3 transition-transform duration-200 group-hover:-translate-y-1 sm:p-4',
           m.minH,
           isWinner ? 'border-primary/40' : 'border-white/10',
         )}
@@ -168,16 +169,22 @@ function PodiumCard({ spot, you, metric }: { spot: Spot; you: boolean; metric: L
           ) : null}
         </div>
 
-        <div className="relative mt-3 truncate text-base font-semibold text-foreground">{tag}</div>
+        <div className="relative mt-3 truncate text-sm font-semibold text-foreground sm:text-base">{tag}</div>
 
         <div className="relative mt-2">
-          <div className={cn('font-mono font-bold tabular-nums', isWinner ? 'text-3xl' : 'text-2xl', h.cls)}>
+          <div
+            className={cn(
+              'font-mono font-bold tabular-nums',
+              isWinner ? 'text-xl sm:text-3xl' : 'text-lg sm:text-2xl',
+              h.cls,
+            )}
+          >
             {h.text}
           </div>
           <div className="mt-0.5 text-[10px] uppercase tracking-wider text-muted-foreground">{h.caption}</div>
         </div>
 
-        <div className="relative mt-auto space-y-2 border-t border-white/10 pt-3 text-xs">
+        <div className="relative mt-auto space-y-1.5 border-t border-white/10 pt-2.5 text-[11px] sm:space-y-2 sm:pt-3 sm:text-xs">
           <StatRow label="Accuracy" value={settled ? formatPct(e.winRatePct, false) : 'New'} />
           <StatRow label="Predictions" value={String(e.totalBets)} />
         </div>

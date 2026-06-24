@@ -99,8 +99,8 @@ export default function LeaderboardPage() {
 
           {/* Search + sortable Profit/Loss | Volume table */}
           <div className="px-1">
-            <div className="grid grid-cols-[1.5rem_1fr_auto] items-center gap-3 border-b border-white/10 pb-3 sm:grid-cols-[1.5rem_1fr_8rem_8rem]">
-              <div className="col-span-2 flex items-center gap-2 text-muted-foreground">
+            <div className="space-y-2 border-b border-white/10 pb-3 sm:grid sm:grid-cols-[1.5rem_1fr_8rem_8rem] sm:items-center sm:gap-3 sm:space-y-0">
+              <div className="flex items-center gap-2 text-muted-foreground sm:col-span-2">
                 <Search className="size-4 shrink-0" />
                 <input
                   value={query}
@@ -109,13 +109,17 @@ export default function LeaderboardPage() {
                   className="w-full bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
                 />
               </div>
-              <SortHeader label="Profit/Loss" active={metric === 'pnl'} onClick={() => setMetric('pnl')} />
-              <SortHeader
-                label="Volume"
-                active={metric === 'volume'}
-                onClick={() => setMetric('volume')}
-                className="hidden sm:flex sm:border-l sm:border-white/15"
-              />
+              {/* On mobile both sort options sit in a single row below the search so
+                  the Volume metric is reachable; on desktop they're column headers. */}
+              <div className="flex items-center justify-end gap-4 sm:contents">
+                <SortHeader label="Profit/Loss" active={metric === 'pnl'} onClick={() => setMetric('pnl')} />
+                <SortHeader
+                  label="Volume"
+                  active={metric === 'volume'}
+                  onClick={() => setMetric('volume')}
+                  className="border-l border-white/15 pl-4 sm:pl-0"
+                />
+              </div>
             </div>
 
             <div className="divide-y divide-white/[0.06]">
@@ -213,7 +217,7 @@ function LeaderRow({
       <Link
         href={profilePath(entry.address)}
         className={cn(
-          'grid grid-cols-[1.5rem_1fr_auto] items-center gap-3 rounded-lg px-1 py-3.5 transition-colors hover:bg-white/[0.03] sm:grid-cols-[1.5rem_1fr_8rem_8rem]',
+          'grid grid-cols-[1.25rem_minmax(0,1fr)_auto] items-center gap-2.5 rounded-lg px-1 py-3.5 transition-colors hover:bg-white/[0.03] sm:grid-cols-[1.5rem_1fr_8rem_8rem] sm:gap-3',
           isYou && 'bg-primary/[0.07]',
         )}
       >
@@ -246,22 +250,23 @@ function LeaderRow({
           </div>
         </div>
 
-        {/* Profit/Loss */}
+        {/* Profit/Loss — on mobile only one value column is shown (the active
+            metric), on sm+ both columns are visible side by side. */}
         <div
           className={cn(
-            'text-right font-mono text-[15px] font-semibold tabular-nums sm:w-32',
-            metric === 'pnl' ? (pnlUp ? 'text-positive' : 'text-negative') : 'text-muted-foreground',
+            'text-right font-mono text-sm font-semibold tabular-nums sm:block sm:w-32 sm:text-[15px]',
+            metric === 'pnl' ? (pnlUp ? 'text-positive' : 'text-negative') : 'hidden text-muted-foreground sm:text-muted-foreground',
           )}
         >
           {pnlUp ? '+' : '-'}
           {formatUsd(Math.abs(entry.pnlUsd))}
         </div>
 
-        {/* Volume (hidden on the narrowest screens, like the reference's two columns) */}
+        {/* Volume */}
         <div
           className={cn(
-            'hidden text-right font-mono text-[15px] tabular-nums sm:block sm:w-32',
-            metric === 'volume' ? 'font-semibold text-foreground' : 'text-muted-foreground',
+            'text-right font-mono text-sm tabular-nums sm:block sm:w-32 sm:text-[15px]',
+            metric === 'volume' ? 'font-semibold text-foreground' : 'hidden text-muted-foreground sm:text-muted-foreground',
           )}
         >
           {formatUsd(entry.wageredUsd)}

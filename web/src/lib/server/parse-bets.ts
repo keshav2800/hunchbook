@@ -54,7 +54,21 @@ type TxBlock = {
   balanceChanges?:
     | { coinType: string; owner: unknown; amount: string }[]
     | null;
+  events?: { type: string; parsedJson?: unknown }[] | null;
 };
+
+const DEEPBOOK_BALANCE_EVENT_SUFFIX = '::balance_manager::BalanceEvent';
+type BalanceEventJson = {
+  amount: string;
+  asset: { name: string };
+  deposit: boolean;
+};
+const isBalanceEvent = (j: unknown): j is BalanceEventJson =>
+  typeof j === 'object' &&
+  j !== null &&
+  typeof (j as { amount?: unknown }).amount === 'string' &&
+  typeof (j as { deposit?: unknown }).deposit === 'boolean' &&
+  typeof ((j as { asset?: { name?: unknown } }).asset?.name) === 'string';
 
 /** Parse one transaction into a bet or cashout record for `owner` (its sender). */
 export function parseTxForOwner(
@@ -104,25 +118,62 @@ export function parseTxForOwner(
         Math.sign(Number(b.amount)) === sign,
     );
 
+  const ptbCommands = ptb.transactions as unknown[];
+  // Sponsored txs sometimes come back with balanceChanges=null even when the
+  // RPC supposedly populates them — fall through to PTB / event introspection
+  // and only use balanceChanges as a final fallback for unfamiliar shapes.
+  const splitCoinsAmount = (arg: unknown): number | undefined => {
+    const ref = arg as { Result?: number; NestedResult?: [number, number] };
+    const idx = ref.NestedResult?.[0] ?? ref.Result;
+    if (idx === undefined) return undefined;
+    const cmd = ptbCommands[idx] as { SplitCoins?: [unknown, unknown[]] } | undefined;
+    const amounts = cmd?.SplitCoins?.[1];
+    if (!amounts || amounts.length === 0) return undefined;
+    const raw = Number(inputValue(amounts[0]) ?? 0);
+    return raw > 0 ? raw : undefined;
+  };
+  const lastDusdcBalanceEvent = (deposit: boolean): number | undefined => {
+    const ev = tx.events;
+    if (!ev) return undefined;
+    let last: number | undefined;
+    for (const e of ev) {
+      if (!e.type.endsWith(DEEPBOOK_BALANCE_EVENT_SUFFIX)) continue;
+      if (!isBalanceEvent(e.parsedJson)) continue;
+      if (e.parsedJson.deposit !== deposit) continue;
+      if (!e.parsedJson.asset.name.endsWith('::dusdc::DUSDC')) continue;
+      last = Number(e.parsedJson.amount);
+    }
+    return last && last > 0 ? last : undefined;
+  };
+
   const betCall = moveCalls.find((mc) => mc.function === 'place_bet');
   const cashoutCall = moveCalls.find((mc) => mc.function === 'cashout');
   if (betCall?.arguments) {
-    // place_bet args: (predict, manager, oracle, key, quantity, payment, clock)
+    // place_bet args: (predict, manager, oracle, key, quantity, payment, clock).
+    // Stake = the SplitCoins amount that funded the payment coin. Robust to
+    // sponsored txs where the RPC drops balanceChanges.
     const quantityRaw = Number(inputValue(betCall.arguments[4]) ?? 0);
-    const outflow = ownDusdcChange(-1);
-    if (!outflow) return {};
+    let stakeRaw = splitCoinsAmount(betCall.arguments[5]);
+    if (stakeRaw === undefined) {
+      const outflow = ownDusdcChange(-1);
+      stakeRaw = outflow ? Math.abs(Number(outflow.amount)) : undefined;
+    }
+    if (stakeRaw === undefined) return {};
     return {
-      bet: {
-        ...common,
-        stakeUsd: Math.abs(Number(outflow.amount)) / DUSDC_SCALE,
-        units: quantityRaw / DUSDC_SCALE,
-      },
+      bet: { ...common, stakeUsd: stakeRaw / DUSDC_SCALE, units: quantityRaw / DUSDC_SCALE },
     };
   }
   if (cashoutCall) {
-    const inflow = ownDusdcChange(1);
-    if (!inflow) return {};
-    return { cashout: { ...common, receivedUsd: Number(inflow.amount) / DUSDC_SCALE } };
+    // Net dUSDC the user got back. Deepbook's balance_manager emits a
+    // BalanceEvent(deposit=false) when withdrawing to the sender — that's the
+    // user-facing payout. Fall back to balanceChanges if events are absent.
+    let receivedRaw = lastDusdcBalanceEvent(false);
+    if (receivedRaw === undefined) {
+      const inflow = ownDusdcChange(1);
+      receivedRaw = inflow ? Number(inflow.amount) : undefined;
+    }
+    if (receivedRaw === undefined) return {};
+    return { cashout: { ...common, receivedUsd: receivedRaw / DUSDC_SCALE } };
   }
   return {};
 }
@@ -138,7 +189,7 @@ export async function parseBetsFromHistory(
   do {
     const page = await client.queryTransactionBlocks({
       filter: { FromAddress: owner },
-      options: { showInput: true, showBalanceChanges: true, showEffects: true },
+      options: { showInput: true, showBalanceChanges: true, showEffects: true, showEvents: true },
       cursor: cursor ?? undefined,
       limit: 50,
     });

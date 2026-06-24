@@ -283,7 +283,12 @@ async function readManagerWings(client: SuiClient): Promise<WingPosition[]> {
   } while (cursor && ids.length < 100);
   if (ids.length === 0) return [];
 
-  const objs = await client.multiGetObjects({ ids, options: { showContent: true } });
+  // sui_multiGetObjects caps each request at 50 ids, so fetch in chunks.
+  const objs = [];
+  for (let i = 0; i < ids.length; i += 50) {
+    const chunk = ids.slice(i, i + 50);
+    objs.push(...(await client.multiGetObjects({ ids: chunk, options: { showContent: true } })));
+  }
   const wings: WingPosition[] = [];
   for (const obj of objs) {
     const oc = obj.data?.content;
