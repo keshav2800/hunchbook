@@ -18,14 +18,15 @@ const geistMono = Geist_Mono({
 
 const SITE_TITLE = "Hunchbook";
 const SITE_DESC = "Prediction markets and liquidity vault on Sui / DeepBook";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://hunchbook.tech"),
+  metadataBase: new URL(SITE_URL),
   title: SITE_TITLE,
   description: SITE_DESC,
   openGraph: {
     type: "website",
-    url: "https://hunchbook.tech",
+    url: SITE_URL,
     siteName: SITE_TITLE,
     title: SITE_TITLE,
     description: SITE_DESC,
