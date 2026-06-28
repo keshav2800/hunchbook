@@ -47,6 +47,14 @@ export const metadata: Metadata = {
   },
 };
 
+const orgJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: SITE_TITLE,
+  url: SITE_URL,
+  logo: `${SITE_URL}/hunchbook.png`,
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -58,6 +66,12 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} dark h-full antialiased`}
     >
       <body className="min-h-full">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(orgJsonLd).replace(/</g, "\\u003c"),
+          }}
+        />
         <Providers>
           <TooltipProvider>
             <TopNav />
